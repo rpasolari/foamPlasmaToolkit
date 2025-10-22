@@ -1,0 +1,74 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _8dbc61e11c-20241220 OPENFOAM=2412 version=v2412
+Arch   : "LSB;label=32;scalar=64"
+Exec   : plasmaFoam
+Date   : Oct 19 2025
+Time   : 20:15:10
+Host   : rpasolari
+PID    : 36190
+I/O    : uncollated
+Case   : /home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/testFoamPlasma
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create fluid mesh for region domain1 for time = 0
+
+Create dielectric mesh for region domain2 for time = 0
+
+*** Reading fields for region domain1
+
+   Adding to ePotentialFluid
+
+   Adding to eChargeFluid
+
+   Adding material's permittivity
+
+   Adding fvOptions
+
+*** Reading fields for region domain2
+
+   Adding to ePotentialDielectric
+
+   Adding material's permittivity
+
+Time = 1
+
+
+Solving for fluid region domain1
+TAKA1
+TAKA9
+TAKA10
+TAKA11
+TAKA13
+TAKA15
+TAKA16
+TAKA17
+GAMG:  Solving for ePotential, Initial residual = 1, Final residual = 5.70206e-17, No Iterations 1
+TAKA18
+
+Solving for dielectric region domain2
+TAKA1
+TAKA9
+TAKA10
+TAKA11
+TAKA13
+TAKA15
+TAKA16
+TAKA17
+GAMG:  Solving for ePotential, Initial residual = 1, Final residual = 0, No Iterations 1
+TAKA18
+ExecutionTime = 0.01 s  ClockTime = 0 s
+
+End
+

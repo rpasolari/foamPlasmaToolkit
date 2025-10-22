@@ -1,0 +1,48 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+FoamFile
+{
+    format          ascii;
+    class           dictionary;
+    location        "constant/leftFluid";
+    object          properties;
+}
+
+epsilonRleftFluid 1;
+
+epsilonRrightSolid 1;
+
+dirichletValueLeft 10;
+
+dirichletValueRight 1;
+
+laplacianScheme Gauss linear corrected;
+
+solver          PCG;
+
+smoother        GaussSeidel;
+
+preconditioner  DIC;
+
+tolerance       1e-08;
+
+relTol          0;
+
+nNonOrthogonalCorrectors 0;
+
+deltaT          0.1;
+
+endTime         1;
+
+writeInterval   1;
+
+dielectricConstant 1;
+
+
+// ************************************************************************* //

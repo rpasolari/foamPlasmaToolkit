@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "../configuration/config"
+
+solvers
+{
+    ePotential
+    {
+        solver          $solver;
+	    smoother 	    $smoother;
+        preconditioner  $preconditioner;
+        tolerance       $tolerance;
+        relTol          $relTol;
+    }
+}
+
+electricPotential
+{
+    nNonOrthogonalCorrectors $nNonOrthogonalCorrectors;
+}
+PIMPLE
+{
+}
+
+coupledConvergence
+{
+   ncoupledConvergenceCorrectors  500;
+   coupledConvergenceResidualControl
+    {
+        ePotential
+        {
+            tolerance       1.0e-8;
+            relTol          0;
+        }
+    }
+}
+
+// ************************************************************************* //

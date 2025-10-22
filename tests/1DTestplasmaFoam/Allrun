@@ -1,0 +1,105 @@
+#!/bin/bash
+cd ${0%/*} || exit 1
+
+./Allclean
+
+# Source run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+blockMesh
+
+topoSet
+
+cp -r 0.orig 0
+
+# Create logs folder
+mkdir -p logs
+
+# Create .foam file for paraview
+touch case.foam
+
+splitMeshRegions -cellZones -overwrite
+
+for region in $(foamListRegions)
+do 
+    cp constant/properties constant/$region/properties
+done
+# Remove redundant files in 0
+for region in $(foamListRegions dielectric)
+do
+    rm -f 0/$region/eCharge
+done
+
+for domain in $(foamListRegions); do
+    # Create folder if it doesn't exist
+    mkdir -p system/$domain
+
+    # Copy fvSchemes and fvSolution
+    cp system/fvSchemes system/$domain/fvSchemes
+    cp system/fvSolution system/$domain/fvSolution
+
+    # Update 'location' entry in fvSchemes
+    sed -i 's@#include[[:space:]]*"\.\./@#include "../../@' system/$domain/fvSchemes
+    sed -i 's@#include[[:space:]]*"\.\./@#include "../../@' system/$domain/fvSolution
+    foamDictionary system/$domain/fvSchemes -entry "FoamFile/location" -set "\"system/$domain\""
+    foamDictionary system/$domain/fvSolution -entry "FoamFile/location" -set "\"system/$domain\""
+
+    sed -i 's@#include "../@#include "../../@' constant/$domain/properties
+    # Extract domain number (e.g. domain1 -> 1, domain2 -> 2)
+    # Replace epsilonR → epsilonR<domain>
+    sed -i "s/epsilonR/epsilonR${domain}/g" constant/$domain/properties
+
+    # Update FoamFile/location entry accordingly
+    foamDictionary constant/$domain/properties \
+        -entry "FoamFile/location" \
+        -set "\"constant/$domain\""
+done
+
+sed -i '/^[[:space:]]*left[[:space:]]*$/,/^[[:space:]]*}[[:space:]]*$/ {
+    s/^[[:space:]]*type[[:space:]]\+zeroGradient;/        #include        "..\/..\/configuration\/config"\n        type            fixedValue;\
+        value           uniform $dirichletValueLeft;/
+}' 0/leftFluid/ePotential
+
+sed -i '/^[[:space:]]*right[[:space:]]*$/,/^[[:space:]]*}[[:space:]]*$/ {
+    s/^[[:space:]]*type[[:space:]]\+zeroGradient;/        #include      "..\/..\/configuration\/config"\n        type            fixedValue;\
+        value           uniform $dirichletValueRight;/
+}' 0/rightSolid/ePotential
+
+# # sed -i "/^[[:space:]]*domain1_to_domain2[[:space:]]*$/,/}/ {
+# #     s/^[[:space:]]*type[[:space:]]\+calculated;/        #include         \"..\/..\/configuration\/config\"\n        type            fixedValue;/
+# #     s/^[[:space:]]*value[[:space:]]\+uniform[[:space:]]\+0;/        value           uniform 0;/
+# # }" 0/domain1/ePotential
+
+# # sed -i "/^[[:space:]]*domain2_to_domain1[[:space:]]*$/,/}/ {
+# #     s/^[[:space:]]*type[[:space:]]\+calculated;/        #include        \"..\/..\/configuration\/config\"\n        type            fixedValue;/
+# #     s/^[[:space:]]*value[[:space:]]\+uniform[[:space:]]\+0;/        value           uniform 0;/
+# # }" 0/domain2/ePotential
+
+sed -i "/^[[:space:]]*leftFluid_to_rightSolid[[:space:]]*$/,/}/ {
+    s/^[[:space:]]*type[[:space:]]\+calculated;/        #include         \"..\/..\/configuration\/config\"\n        type            coupledElectricPotential;/
+    s/^[[:space:]]*value[[:space:]]\+uniform[[:space:]]\+0;/        value           uniform 0;\
+        useImplicit         true;/
+}" 0/leftFluid/ePotential
+
+sed -i "/^[[:space:]]*rightSolid_to_leftFluid[[:space:]]*$/,/}/ {
+    s/^[[:space:]]*type[[:space:]]\+calculated;/        #include        \"..\/..\/configuration\/config\"\n        type            coupledElectricPotential;/
+    s/^[[:space:]]*value[[:space:]]\+uniform[[:space:]]\+0;/        value           uniform 0;\
+        useImplicit         true;/
+}" 0/rightSolid/ePotential
+
+# # # sed -i '/^[[:space:]]*domain2_to_domain1[[:space:]]*$/,/^[[:space:]]*}[[:space:]]*$/ {
+# # #     s/^[[:space:]]*type[[:space:]]\+extrapolatedCalculated;/        #include         "..\/..\/configuration\/config"\n        type             coupledElectricPotential;/ 
+# # #     s/^[[:space:]]*value[[:space:]]\+uniform[[:space:]]\+0;/        value            $internalField;\
+# # #         sigmaS           uniform $sigmaS;/
+# # # }' 0/domain2/ePotential
+
+# # # foamDictionary 0/domain1/ePotential -set 'boundaryField/domain1_to_domain2/sigmaS=uniform $sigmaS'
+# # # foamDictionary 0/domain2/ePotential -set 'boundaryField/domain2_to_domain1/sigmaS=uniform $sigmaS'
+
+# runApplication $(getApplication)
+# mv log.* ./logs/
+
+# # for domain in domain1 domain2; do
+# #     foamToVTK -region $domain -noPointValues -time 1
+# #     mv VTK/$domain/*.vtk VTK/$domain/file.vtk
+# # done

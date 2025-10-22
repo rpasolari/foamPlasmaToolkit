@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#---------------------------------------------
+#  Allwmake script for foamPlasmaMultiRun suite
+#  Builds all libraries and the solver
+#---------------------------------------------
+
+# Set colors
+GREEN='\033[1;32m'
+NC='\033[0m'
+
+set -e	# Exit on first error
+
+# Move to script directory (in case called from elsewhere)
+cd "${0%/*}" || exit 1
+
+echo "Building plasma models and solver..."
+echo "-------------------------------------"
+
+# Libraries
+# wmake libso src/plasmaModels
+wmake libso src/bcs/coupledElectricPotential
+# wmake libso src/controls/coupledRegionControl
+
+# Executables
+wmake src/applications/solvers/plasmaFoam
+
+echo
+echo "-------------------------------------"
+echo -e "${GREEN}Build complete.${NC}"
+echo "Libraries are in: \$FOAM_USER_LIBBIN ($FOAM_USER_LIBBIN)"
+echo "Solvers are in:     \$FOAM_USER_APPBIN ($FOAM_USER_APPBIN)"
+echo "-------------------------------------"

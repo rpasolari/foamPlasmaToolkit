@@ -1,0 +1,97 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0.5/leftFluid";
+    object      ePotential;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 2 -3 0 0 -1 0];
+
+internalField   nonuniform List<scalar> 
+22
+(
+18.5784
+35.7352
+52.892
+18.5784
+35.7352
+52.892
+70.0489
+18.5784
+35.7352
+52.892
+70.0489
+87.2057
+18.5784
+35.7352
+52.892
+70.0489
+87.2057
+18.5784
+35.7352
+52.892
+70.0489
+87.2057
+)
+;
+
+boundaryField
+{
+    backFront
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+    top
+    {
+        type            zeroGradient;
+    }
+    left
+    {
+        type            fixedValue;
+        value           uniform 10;
+    }
+    leftFluid_to_rightSolid
+    {
+        type            coupledElectricPotential;
+        useImplicit     true;
+        refValue        nonuniform List<scalar> 3(86.2057 86.2057 86.2057);
+        refGradient     uniform 112.941;
+        valueFraction   uniform 0.833333;
+        source          nonuniform List<scalar> 3(1.66667e-10 1.66667e-10 1.66667e-10);
+        value           nonuniform List<scalar> 3(95.7841 95.7841 95.7841);
+        surfCharge      surfCharge;
+        logInterval     -1;
+        writePrecision  6;
+        updateHeader    1;
+        writeToFile     0;
+        useUserTime     1;
+    }
+    procBoundary0to1
+    {
+        type            processor;
+        value           nonuniform List<scalar> 4(70.0489 70.0489 87.2057 87.2057);
+    }
+    procBoundary0to3
+    {
+        type            processor;
+        value           nonuniform List<scalar> 3(18.5784 35.7352 52.892);
+    }
+}
+
+
+// ************************************************************************* //

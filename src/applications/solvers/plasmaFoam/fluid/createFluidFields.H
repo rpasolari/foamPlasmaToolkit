@@ -14,7 +14,7 @@
 
 PtrList<volScalarField> ePotentialFluid(fluidRegions.size());
 PtrList<volScalarField> eChargeFluid(fluidRegions.size());
-PtrList<volScalarField> surfChargeFluid(fluidRegions.size());
+PtrList<surfaceScalarField> surfChargeFluid(fluidRegions.size());
 PtrList<IOdictionary> propertiesDictFluid(fluidRegions.size());
 PtrList<dimensionedScalar> epsilonFluid(fluidRegions.size());
 
@@ -73,12 +73,12 @@ forAll(fluidRegions, i)
             IOobject::AUTO_WRITE
         );
 
-        if (surfChargeHeader.typeHeaderOk<volScalarField>())
+        if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
         {
             surfChargeFluid.set
             (
                 i,
-                new volScalarField
+                new surfaceScalarField
                 (
                     IOobject
                     (

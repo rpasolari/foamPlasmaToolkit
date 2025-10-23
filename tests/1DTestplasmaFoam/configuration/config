@@ -1,6 +1,6 @@
 
 epsilonRleftFluid		1.0;
-epsilonRrightSolid		1.0;	
+epsilonRrightSolid		5.0;	
 
 dirichletValueLeft		10;
 dirichletValueRight		1.0;

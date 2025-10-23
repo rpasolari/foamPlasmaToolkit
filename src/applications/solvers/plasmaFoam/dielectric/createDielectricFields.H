@@ -14,7 +14,7 @@
 
 PtrList<volScalarField> ePotentialDielectric(dielectricRegions.size());
 PtrList<IOdictionary> propertiesDictDielectric(dielectricRegions.size());
-PtrList<volScalarField> surfChargeDielectric(dielectricRegions.size());
+PtrList<surfaceScalarField> surfChargeDielectric(dielectricRegions.size());
 PtrList<dimensionedScalar> epsilonDielectric(dielectricRegions.size());
 
 List<scalar> epsilonRDielectric(dielectricRegions.size());
@@ -52,12 +52,12 @@ forAll(dielectricRegions, i)
             IOobject::AUTO_WRITE
         );
 
-        if (surfChargeHeader.typeHeaderOk<volScalarField>())
+        if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
         {
             surfChargeDielectric.set
             (
                 i,
-                new volScalarField
+                new surfaceScalarField
                 (
                     IOobject
                     (

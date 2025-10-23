@@ -1,0 +1,26 @@
+#------------------------------------------------------------------------------#
+#  File: bashrc
+#  Part of: foamPlasmaToolkit
+#  Developed for use with the OpenFOAM framework.
+#
+#  Description:
+#      Environment setup script for foamPlasmaToolkit.
+#      Extends the OpenFOAM configuration by prepending this toolkit’s `etc/`
+#      directory to the FOAM_ETC search path, enabling #includeEtc to locate
+#      additional caseDicts and configuration files provided by the toolkit.
+#
+#  Author: Rention Pasolari
+#  Copyright (C) 2025
+#  License: GNU General Public License v3 or later
+#      See: <http://www.gnu.org/licenses/>.
+#------------------------------------------------------------------------------#
+
+# Determine foamPlasmaToolkit root directory (one level above this file)
+export FOAM_PLASMA=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+# Prepend etc/ to the FOAM_ETC lookup path (do NOT override, extend)
+export FOAM_PLASMA_ETC="$FOAM_PLASMA/etc"
+
+export FOAM_PLASMA_TUTORIALS="$FOAM_PLASMA/tutorials"
+
+export FOAM_PLASMA_SRC="$FOAM_PLASMA/src"

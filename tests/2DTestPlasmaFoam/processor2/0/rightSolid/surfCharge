@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       surfaceScalarField;
+    location    "0/rightSolid";
+    object      surfCharge;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 -2 1 0 0 1 0 ];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    backFront
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    top
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    right
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    rightSolid_to_leftFluid
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    procBoundary2to1
+    {
+        type            processor;
+        value           uniform 0;
+    }
+    procBoundary2to3
+    {
+        type            processor;
+        value           uniform 0;
+    }
+}
+
+
+// ************************************************************************* //

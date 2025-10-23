@@ -387,10 +387,13 @@ void coupledElectricPotentialFvPatchScalarField::updateCoeffs()
     scalarField epsilonDeltaC(this->size(), GREAT);
 
     scalarField surfCharge(phiP.size(), Zero);
-    if (surfChargeName_ != "none")
-    {
-        surfCharge = patch().lookupPatchField<volScalarField>(surfChargeName_);
-    }
+	if (surfChargeName_ != "none")
+	{
+		surfCharge =
+			patch().lookupPatchField<surfaceScalarField>(
+				surfChargeName_
+			);
+	}
 
     scalarField surfChargeNbr(phiP.size(), Zero);
     if (surfChargeNbrName_ != "none")
@@ -406,13 +409,13 @@ void coupledElectricPotentialFvPatchScalarField::updateCoeffs()
                     .boundary()[samplePatchi];
 
             surfChargeNbr =
-                nbrPatch.lookupPatchField<volScalarField>
+                nbrPatch.lookupPatchField<surfaceScalarField>
                 (surfChargeNbrName_);
         }
         else
         {
             surfChargeNbr =
-                patch().lookupPatchField<volScalarField>
+                patch().lookupPatchField<surfaceScalarField>
                 (surfChargeNbrName_);
         }
 

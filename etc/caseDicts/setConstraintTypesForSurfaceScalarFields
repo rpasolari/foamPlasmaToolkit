@@ -1,0 +1,25 @@
+/*---------------------------------------------------------------------------*\
+  File: setConstraintTypesForSurfaceScalarFields
+  Part of: foamPlasmaToolkit
+  Developed for use with the OpenFOAM framework.
+
+  Description:
+      Derived from setConstraintTypes in OpenFOAM v2412.
+      Tailored for surfaceScalarFields (fvsPatchFields).
+      Provides safe default boundary-condition templates and ensures
+      that patches which require explicit 'value' entries receive them.
+
+  Author: Rention Pasolari
+  Copyright (C) 2025
+  License: GNU General Public License v3 or later
+      See: <http://www.gnu.org/licenses/>.
+\*---------------------------------------------------------------------------*/
+#includeEtc "caseDicts/setConstraintTypes"
+
+processor
+{
+    type  processor;
+    value uniform 0;
+}
+
+// ************************************************************************* //

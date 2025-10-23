@@ -16,7 +16,7 @@ FoamFile
 
 epsilonRleftFluid 1;
 
-epsilonRrightSolid 1;
+epsilonRrightSolid 5;
 
 dirichletValueLeft 10;
 
@@ -36,13 +36,13 @@ relTol          0;
 
 nNonOrthogonalCorrectors 0;
 
-deltaT          0.1;
+deltaT          1;
 
 endTime         1;
 
 writeInterval   1;
 
-dielectricConstant 1;
+dielectricConstant 5;
 
 
 // ************************************************************************* //

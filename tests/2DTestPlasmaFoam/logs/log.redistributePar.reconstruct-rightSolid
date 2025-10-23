@@ -1,0 +1,561 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _8dbc61e11c-20241220 OPENFOAM=2412 version=v2412
+Arch   : "LSB;label=32;scalar=64"
+Exec   : redistributePar -parallel -reconstruct -region rightSolid
+Date   : Oct 23 2025
+Time   : 17:52:45
+Host   : rpasolari
+PID    : 216016
+I/O    : uncollated
+Case   : /home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam
+nProcs : 4
+Hosts  :
+(
+    (rpasolari 4)
+)
+Pstream initialized with:
+    floatTransfer      : false
+    maxCommsSize       : 0
+    nProcsSimpleSum    : 0
+    nonBlockingExchange: 0 (tuning: 0)
+    exchange algorithm : 0
+    commsType          : nonBlocking
+    polling iterations : 0
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+sigFpe : Disabling floating point exception trapping
+Reconstructing case (like reconstructParMesh)
+
+Switching to exact matching for "processors4" processor directories
+
+--> FOAM Warning : 
+    Added implicit -overwrite for decompose/reconstruct modes
+
+Create time
+
+Create undecomposed database
+
+Using region: rightSolid
+
+
+Reconstructing mesh and addressing
+
+
+Reconstructing mesh:rightSolid
+
+Time = 0.05
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+I/O    : uncollated
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+I/O    : uncollated
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [0] : "constant"
+    area   mesh [0] : "constant"
+
+No undecomposed mesh. Creating from: "constant"
+    Boundary definition OK.
+
+Reconstructing mesh
+
+After distribution:
+
+Processor 0
+    Number of cells = 50
+    Number of processor patches = 0
+    Number of processor faces = 0
+    Number of boundary faces = 130
+
+Processor 1 (empty)
+
+Processor 2 (empty)
+
+Processor 3 (empty)
+
+Number of processor faces = 0
+Max number of cells = 50
+Max number of processor patches = 0
+Max number of faces between processors = 0
+
+Setting caseName to "2DTestPlasmaFoam" to write reconstructed mesh (and fields).
+Restoring caseName
+Written redistributed mesh to "constant"
+
+Writing (reconstruct) procAddressing files to constant/polyMesh
+Setting caseName to "2DTestPlasmaFoam" to write reconstructed refinement data.
+Restoring caseName
+Time = 0.1
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.15
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.2
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.25
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.3
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.35
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.4
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.45
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.5
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.55
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.6
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.65
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.7
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.75
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.8
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.85
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.9
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 0.95
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+Time = 1
+
+Per processor availability of "faces" file in "constant/rightSolid/polyMesh"
+    (1 1 1 1)
+
+Per processor availability of "faceLabels" file in "constant/rightSolid/finite-area/faMesh"
+    (0 0 0 0)
+
+Checking "2DTestPlasmaFoam" for undecomposed volume and area meshes...
+    volume mesh [1] : "constant"
+    area   mesh [0] : "constant"
+
+
+Reconstructing fields
+
+Time = 0.05
+
+Reading undecomposed mesh (on master)
+    Boundary definition OK.
+Reading local, decomposed mesh
+    Boundary definition OK.
+Reading (cell|face|point|boundary)ProcAddressing from constant/polyMesh
+
+Time = 0.05
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.05/uniform"
+Time = 0.1
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.1/uniform"
+Time = 0.15
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.15/uniform"
+Time = 0.2
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.2/uniform"
+Time = 0.25
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.25/uniform"
+Time = 0.3
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.3/uniform"
+Time = 0.35
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.35/uniform"
+Time = 0.4
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.4/uniform"
+Time = 0.45
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.45/uniform"
+Time = 0.5
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.5/uniform"
+Time = 0.55
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.55/uniform"
+Time = 0.6
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.6/uniform"
+Time = 0.65
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.65/uniform"
+Time = 0.7
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.7/uniform"
+Time = 0.75
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.75/uniform"
+Time = 0.8
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.8/uniform"
+Time = 0.85
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.85/uniform"
+Time = 0.9
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.9/uniform"
+Time = 0.95
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/0.95/uniform"
+Time = 1
+
+    Reconstructing volScalarFields
+
+        ePotential
+
+    Reconstructing surfaceScalarFields
+
+        surfCharge
+
+Detected additional non-decomposed files in "/home/rpasolari-wsl/Linux-Desktop/CERTH/solvers/OpenFOAM/OF2412/foamPlasmaToolkit/tests/2DTestPlasmaFoam/processor0/1/uniform"
+End
+
+Finalising parallel run

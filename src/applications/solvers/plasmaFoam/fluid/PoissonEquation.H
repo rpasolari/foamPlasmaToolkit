@@ -28,9 +28,7 @@
 
     if(coupled)
     {
-        Info << "TAKA" << endl;
         fvMatrixAssemblyPtr->addFvMatrix(ePotentialEquation);
-        Info <<"ELAFKI" << endl;
     }
     else
     {

@@ -16,6 +16,9 @@
 
 volScalarField& ePotential = ePotentialFluid[i];
 volScalarField& eCharge = eChargeFluid[i];
+surfaceScalarField* surfCharge = surfChargeFluid.set(i)
+                                ? &surfChargeFluid[i]
+                                : nullptr;
 
 dimensionedScalar& epsilon = epsilonFluid[i];
 

@@ -874,6 +874,9 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvOptionI.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvOptionListTemplates.C \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/loopControl.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/subLoopTime.H \
+$(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/solutionControl.H \
+$(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/solutionControlTemplates.C \
+$(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/solutionControlI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/postProcess.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addRegionOption.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addFunctionObjectOptions.H \
@@ -891,11 +894,11 @@ createFields.H \
 ./fluid/createFluidFields.H \
 ./dielectric/createDielectricFields.H \
 ./include/createCoupledRegions.H \
+./include/readNonCoupledElectricPotentialControls.H \
+solveElectricPotential.H \
 ./fluid/setRegionFluidFields.H \
-./fluid/solveFluid.H \
 ./fluid/PoissonEquation.H \
 ./dielectric/setRegionDielectricFields.H \
-./dielectric/solveDielectric.H \
 ./dielectric/LaplaceEquation.H \
 
 #END

@@ -15,4 +15,3 @@
 Info << "\nSolving for dielectric region " 
      << dielectricRegions[i].name() << endl;
 
-#include "LaplaceEquation.H"

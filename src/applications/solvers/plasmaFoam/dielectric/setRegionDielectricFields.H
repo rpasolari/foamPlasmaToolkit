@@ -16,6 +16,9 @@
 \*---------------------------------------------------------------------------*/
 
 volScalarField& ePotential = ePotentialDielectric[i];
+surfaceScalarField* surfCharge = surfChargeDielectric.set(i)
+                                ? &surfChargeDielectric[i]
+                                : nullptr;
 
 dimensionedScalar& epsilon = epsilonDielectric[i];
 

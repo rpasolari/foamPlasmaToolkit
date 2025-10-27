@@ -19,6 +19,11 @@ PtrList<dimensionedScalar> epsilonDielectric(dielectricRegions.size());
 
 List<scalar> epsilonRDielectric(dielectricRegions.size());
 
+List<scalar> ePotentialNonCoupledResidualDielectric
+(
+    dielectricRegions.size(), Foam::GREAT
+);
+
 forAll(dielectricRegions, i)
 {
     Info << "*** Reading fields for region "

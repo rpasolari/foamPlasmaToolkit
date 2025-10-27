@@ -22,6 +22,11 @@ List<scalar> epsilonRFluid(fluidRegions.size());
 
 PtrList<fv::options> fvOptionsFluid(fluidRegions.size());
 
+List<scalar> ePotentialNonCoupledResidualFluid
+(
+    fluidRegions.size(), Foam::GREAT
+);
+
 forAll(fluidRegions, i)
 {
     Info << "*** Reading fields for region "

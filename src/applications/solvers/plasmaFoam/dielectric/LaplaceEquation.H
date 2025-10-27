@@ -23,10 +23,20 @@
         fvm::laplacian(epsilon,ePotential)
     );
 
-    if(coupled){
+    LaplaceEquation.relax();
+
+    if(coupled)
+    {
         fvMatrixAssemblyPtr->addFvMatrix(LaplaceEquation);
     }
-    else{
-        LaplaceEquation.solve();
+    else
+    {
+        Info<< "\nSolving for electric potential in region " 
+            << dielectricRegions[i].name() << endl;
+
+        auto sp = LaplaceEquation.solve();
+        ePotentialNonCoupledResidualDielectric[i] = sp.initialResidual();
+
+        ePotential.correctBoundaryConditions();
     }    
 }

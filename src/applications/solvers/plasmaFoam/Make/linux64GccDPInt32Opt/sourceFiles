@@ -1,4 +1,4 @@
 SOURCE = \
-multiPlasmaFoam.C \
+plasmaFoam.C \
 
 # sources

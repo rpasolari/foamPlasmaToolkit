@@ -44,6 +44,9 @@ Author
 #include "coordinateSystem.H"
 #include "loopControl.H"
 
+#include "fvSolution.H"
+#include "solutionControl.H"
+
 int main(int argc, char *argv[])
 {
     argList::addNote
@@ -64,48 +67,16 @@ int main(int argc, char *argv[])
 
     #include "createCoupledRegions.H"
 
+    #include "readNonCoupledElectricPotentialControls.H"
+
     while (runTime.run())
     {
         ++runTime;
 
         Info << "Time = " << runTime.timeName() << nl << endl;
-
-        forAll(fluidRegions, i)
-        {
-            fvMesh& mesh = fluidRegions[i];
-
-            #include "setRegionFluidFields.H"
-            #include "solveFluid.H"
-        }
-
-        forAll(fluidRegions, i)
-        {
-            fvMesh& mesh = fluidRegions[i];
-
-            #include "setRegionDielectricFields.H"
-            #include "solveDielectric.H"
-        }
-
-        if(coupled)
-        {
-            Info<< "\nSolving energy coupled regions " << endl;
-            fvMatrixAssemblyPtr->solve();
-
-           forAll(fluidRegions, i)
-            {
-                volScalarField& ePotential = ePotentialFluid[i];
-                ePotential.correctBoundaryConditions();
-            }
-
-            forAll(dielectricRegions, i)
-            {
-                volScalarField& ePotential = ePotentialDielectric[i];
-                ePotential.correctBoundaryConditions();
-            }
-
-            Info<< "\nSolved coupled energy regions!" << endl;
-            fvMatrixAssemblyPtr->clear();
-        }
+        
+        // Solve the Poisson/Laplace Equation (electric potential)
+        #include "solveElectricPotential.H"
 
         runTime.write();
         runTime.printExecutionTime(Info);

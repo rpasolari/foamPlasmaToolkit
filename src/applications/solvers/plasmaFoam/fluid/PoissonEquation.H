@@ -19,19 +19,31 @@
 \*---------------------------------------------------------------------------*/
 
 {
-    fvScalarMatrix ePotentialEquation
+    fvScalarMatrix PoissonEquation
     (
           fvm::laplacian(epsilon,ePotential)
         ==
           -eCharge
     );
 
+    PoissonEquation.relax();
+
+    fvOptions.constrain(PoissonEquation);
+
     if(coupled)
     {
-        fvMatrixAssemblyPtr->addFvMatrix(ePotentialEquation);
+        fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
     }
     else
     {
-        ePotentialEquation.solve();
+        Info<< "\nSolving for electric potential in region " 
+            << fluidRegions[i].name() << endl;
+
+        auto sp = PoissonEquation.solve();
+        ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
+
+        fvOptions.correct(ePotential);
+
+        ePotential.correctBoundaryConditions();
     }
 }

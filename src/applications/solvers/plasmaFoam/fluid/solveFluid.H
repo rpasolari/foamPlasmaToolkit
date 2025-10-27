@@ -16,4 +16,3 @@
 Info << "\nSolving for fluid region "
      << fluidRegions[i].name() << endl;
 
-#include "PoissonEquation.H"

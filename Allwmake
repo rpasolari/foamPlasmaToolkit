@@ -23,7 +23,7 @@ wmake libso src/bcs/coupledElectricPotential
 # wmake libso src/controls/coupledRegionControl
 
 # Executables
-wmake src/applications/solvers/plasmaFoam
+wmake src/applications/solvers/plasmaDielectricFoam
 
 echo
 echo "-------------------------------------"

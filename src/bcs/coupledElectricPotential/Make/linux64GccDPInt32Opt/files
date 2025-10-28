@@ -1,3 +1,0 @@
-SOURCE += coupledElectricPotentialFvPatchScalarField.C
-
-LIB = $(FOAM_USER_LIBBIN)/libcoupledElectricPotentialFvPatchScalarField

@@ -1,1 +1,13 @@
+# Ignore ALL wmake-generated build folders
+**/linux64Gcc**/
+
+# Ignore object files and dep files (even if outside that folder)
+*.o
+*.dep
+
+# Ignore OpenFOAM wmake temporary metadata
+sourceFiles
+variables
+
+# Ignore tests folder
 /tests

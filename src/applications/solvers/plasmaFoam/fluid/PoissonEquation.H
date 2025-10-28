@@ -36,7 +36,7 @@
     }
     else
     {
-        Info<< "\nSolving for electric potential in region " 
+        Info<< "\nSolving for ePotential in region " 
             << fluidRegions[i].name() << endl;
 
         auto sp = PoissonEquation.solve();

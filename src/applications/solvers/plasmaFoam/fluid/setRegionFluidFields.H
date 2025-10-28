@@ -7,7 +7,7 @@
       Derived from setRegionFluidFields.H in OpenFOAM v2412.
       Defines convenient field references for each fluid region.
       Associates region-specific variables with their corresponding
-      data structures created in createFluidFields.H for use within plasmaFoam.
+      data structures created in createFluidFields.H.
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later

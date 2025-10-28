@@ -30,7 +30,6 @@ scalar ePotentialNonCoupledLoopMaxIter = 0;
 
 bool foundAnyRegionMaxIter = false;
 
-// --- FLUID REGIONS ---
 forAll(fluidRegions, i)
 {
     const fvMesh& mesh = fluidRegions[i];
@@ -52,7 +51,6 @@ forAll(fluidRegions, i)
     }
 }
 
-// --- DIELECTRIC REGIONS ---
 forAll(dielectricRegions, i)
 {
     const fvMesh& mesh = dielectricRegions[i];
@@ -77,4 +75,27 @@ forAll(dielectricRegions, i)
 if (!foundAnyRegionMaxIter)
 {
     ePotentialNonCoupledLoopMaxIter = 100;
+}
+
+// Print settings
+if (!coupled)
+{
+    Info<< "*** Non-coupled ePotential convergence settings:" << nl
+        << "   - Max iterations: " << ePotentialNonCoupledLoopMaxIter << nl;
+
+    forAll(fluidRegions, i)
+    {
+        Info<< "   - (Fluid region) " << fluidRegions[i].name()
+            << " tolerance: " << ePotentialNonCoupledToleranceFluid[i]
+            << nl;
+    }
+
+    forAll(dielectricRegions, i)
+    {
+        Info<< "   - (Dielectric region) " << dielectricRegions[i].name()
+            << " tolerance: "
+            << ePotentialNonCoupledToleranceDielectric[i] << nl;
+    }
+
+    Info<< endl;
 }

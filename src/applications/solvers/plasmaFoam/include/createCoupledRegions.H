@@ -61,8 +61,10 @@ forAll(fluidRegions, i)
 {
     if(coupled)
     {
-        Info << "Create fvMatrixAssembly based on fluid region "
-                << fluidRegions[i].name() << nl << endl;
+        Info<< "Regions are COUPLED; "
+            << "ePotential will be solved MONOLITHICALLY." << nl
+            << "Assembling ePotential fvMatrixAssembly from region "
+            << fluidRegions[i].name() << nl << endl;
 
         fvMatrixAssemblyPtr.reset
         (
@@ -80,8 +82,10 @@ if (coupled && !fvMatrixAssemblyPtr)
 {
     forAll(dielectricRegions, i)
     {
-        Info << "Create fvMatrixAssembly based on dielectric region "
-                << dielectricRegions[i].name() << nl << endl;
+        Info<< "Regions are COUPLED; "
+            << "ePotential will be solved MONOLITHICALLY." << nl
+            << "Assembling ePotential fvMatrixAssembly from region "
+            << dielectricRegions[i].name() << nl << endl;
 
         fvMatrixAssemblyPtr.reset
         (
@@ -95,3 +99,8 @@ if (coupled && !fvMatrixAssemblyPtr)
     }
 }
 
+if (!coupled)
+{
+    Info<< "Regions are NOT coupled; ePotential will be solved in "
+        << "SEGREGATE way" << nl << endl;
+}

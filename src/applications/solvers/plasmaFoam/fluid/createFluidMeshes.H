@@ -5,7 +5,7 @@
 
   Description:
       Derived from createFluidMeshes.H in OpenFOAM v2412.
-      Creates and initializes the fluid-region meshes for plasmaFoam.
+      Creates and initializes the fluid-region meshes.
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later

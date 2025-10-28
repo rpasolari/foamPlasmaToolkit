@@ -31,7 +31,7 @@
     }
     else
     {
-        Info<< "\nSolving for electric potential in region " 
+        Info<< "\nSolving for ePotential in region " 
             << dielectricRegions[i].name() << endl;
 
         auto sp = LaplaceEquation.solve();

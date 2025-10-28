@@ -5,7 +5,7 @@
 
   Description:
       Derived from solveFluid.H in OpenFOAM v2412.
-      Solves the governing equations for the fluid regions in plasmaFoam.
+      Solves the governing equations for the fluid regions.
       Executed for each fluid region within the main time loop.
 
   Copyright (C) 2025 Rention Pasolari

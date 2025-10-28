@@ -69,6 +69,8 @@ int main(int argc, char *argv[])
 
     #include "readNonCoupledElectricPotentialControls.H"
 
+    Info<< "\nStarting iteration loop\n" << endl;
+
     while (runTime.run())
     {
         ++runTime;
@@ -76,7 +78,24 @@ int main(int argc, char *argv[])
         Info << "Time = " << runTime.timeName() << nl << endl;
         
         // Solve the Poisson/Laplace Equation (electric potential)
-        #include "solveElectricPotential.H"
+        if(coupled)
+        {
+            #include "solveElectricPotentialCoupled.H"
+        }
+        else
+        {
+            Info<< "Solving for ePotential in " 
+                << "non-coupled regions (segregate)" << endl;
+            for
+            (
+                int outer = 1;
+                outer <= ePotentialNonCoupledLoopMaxIter;
+                ++outer
+            )
+            {
+                #include "solveElectricPotentialNonCoupled.H"
+            }
+        }
 
         runTime.write();
         runTime.printExecutionTime(Info);

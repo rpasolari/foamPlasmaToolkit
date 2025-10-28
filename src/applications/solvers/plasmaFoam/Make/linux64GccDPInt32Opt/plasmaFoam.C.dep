@@ -895,10 +895,11 @@ createFields.H \
 ./dielectric/createDielectricFields.H \
 ./include/createCoupledRegions.H \
 ./include/readNonCoupledElectricPotentialControls.H \
-solveElectricPotential.H \
+solveElectricPotentialCoupled.H \
 ./fluid/setRegionFluidFields.H \
 ./fluid/PoissonEquation.H \
 ./dielectric/setRegionDielectricFields.H \
 ./dielectric/LaplaceEquation.H \
+solveElectricPotentialNonCoupled.H \
 
 #END

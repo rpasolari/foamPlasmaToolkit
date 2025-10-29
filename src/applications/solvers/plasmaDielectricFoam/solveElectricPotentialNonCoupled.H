@@ -12,69 +12,75 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-Info<< "\n  -ePotential iteration (" << outer << "/" 
-    << ePotentialNonCoupledLoopMaxIter << ")" << endl;
+Info<< "Solving for ePotential in " 
+    << "non-coupled regions (segregate)" << endl;
 
-// Reset residual lists each iteration
-forAll(ePotentialNonCoupledResidualFluid, i)
-    ePotentialNonCoupledResidualFluid[i] = Foam::GREAT;
-
-forAll(ePotentialNonCoupledResidualDielectric, i)
-    ePotentialNonCoupledResidualDielectric[i] = Foam::GREAT;
-
-forAll(fluidRegions, i)
+for(int outer = 1; outer <= ePotentialNonCoupledLoopMaxIter; ++outer)
 {
-    fvMesh& mesh = fluidRegions[i];
-    #include "setRegionFluidFields.H"
-    #include "PoissonEquation.H"
-}
 
-forAll(dielectricRegions, i)
-{
-    fvMesh& mesh = dielectricRegions[i];
-    #include "setRegionDielectricFields.H"
-    #include "LaplaceEquation.H"
-}
+    Info<< "\n  -ePotential iteration (" << outer << "/" 
+        << ePotentialNonCoupledLoopMaxIter << ")" << endl;
 
-// Check convergence
-bool allOK = true;
+    // Reset residual lists each iteration
+    forAll(ePotentialNonCoupledResidualFluid, i)
+        ePotentialNonCoupledResidualFluid[i] = Foam::GREAT;
 
-forAll(ePotentialNonCoupledResidualFluid, i)
-{
-    if
-    (
-        ePotentialNonCoupledResidualFluid[i]
-        >= ePotentialNonCoupledToleranceFluid[i]
-    )
+    forAll(ePotentialNonCoupledResidualDielectric, i)
+        ePotentialNonCoupledResidualDielectric[i] = Foam::GREAT;
+
+    forAll(fluidRegions, i)
     {
-        allOK = false;
+        fvMesh& mesh = fluidRegions[i];
+        #include "setRegionFluidFields.H"
+        #include "PoissonEquation.H"
+    }
+
+    forAll(dielectricRegions, i)
+    {
+        fvMesh& mesh = dielectricRegions[i];
+        #include "setRegionDielectricFields.H"
+        #include "LaplaceEquation.H"
+    }
+
+    // Check convergence
+    bool allOK = true;
+
+    forAll(ePotentialNonCoupledResidualFluid, i)
+    {
+        if
+        (
+            ePotentialNonCoupledResidualFluid[i]
+            >= ePotentialNonCoupledToleranceFluid[i]
+        )
+        {
+            allOK = false;
+        }
+    }
+
+    forAll(ePotentialNonCoupledResidualDielectric, i)
+    {
+        if
+        (
+            ePotentialNonCoupledResidualDielectric[i]
+            >= ePotentialNonCoupledToleranceDielectric[i]
+        )
+        {
+            allOK = false;
+        }
+    }
+
+    if (allOK)
+    {
+        Info<< "\n>>> ePotential converged in "
+            << outer << " iterations." << nl;
+        break;
+    }
+    else if (outer == ePotentialNonCoupledLoopMaxIter)
+    {
+        Info<< "\n>>> WARNING: ePotential did NOT converge after "
+            << outer << " iterations." << nl;
     }
 }
-
-forAll(ePotentialNonCoupledResidualDielectric, i)
-{
-    if
-    (
-        ePotentialNonCoupledResidualDielectric[i]
-        >= ePotentialNonCoupledToleranceDielectric[i]
-    )
-    {
-        allOK = false;
-    }
-}
-
-if (allOK)
-{
-    Info<< "\n>>> ePotential converged in "
-        << outer << " iterations." << nl;
-    break;
-}
-else if (outer == ePotentialNonCoupledLoopMaxIter)
-{
-    Info<< "\n>>> WARNING: ePotential did NOT converge after "
-        << outer << " iterations." << nl;
-}
-
 
 
 

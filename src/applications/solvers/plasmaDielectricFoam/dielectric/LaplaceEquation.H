@@ -34,9 +34,20 @@
         Info<< "\nSolving for ePotential in region " 
             << dielectricRegions[i].name() << endl;
 
-        auto sp = LaplaceEquation.solve();
-        ePotentialNonCoupledResidualDielectric[i] = sp.initialResidual();
+        for (int nonOrth = 0; nonOrth <= nNonOrthoCorrDielectric[i]; ++nonOrth)
+        {
+            auto sp = LaplaceEquation.solve();
 
-        ePotential.correctBoundaryConditions();
+            if (nonOrth == 0)
+            {
+                ePotentialNonCoupledResidualDielectric[i] =
+                    sp.initialResidual();
+            }
+
+            if (nonOrth == nNonOrthoCorrDielectric[i])
+            {
+                ePotential.correctBoundaryConditions();
+            }
+        }
     }    
 }

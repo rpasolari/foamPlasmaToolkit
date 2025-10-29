@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     #include "createCoupledRegions.H"
 
-    #include "readNonCoupledElectricPotentialControls.H"
+    #include "readElectricPotentialControls.H"
 
     Info<< "\nStarting iteration loop\n" << endl;
 
@@ -84,17 +84,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            Info<< "Solving for ePotential in " 
-                << "non-coupled regions (segregate)" << endl;
-            for
-            (
-                int outer = 1;
-                outer <= ePotentialNonCoupledLoopMaxIter;
-                ++outer
-            )
-            {
-                #include "solveElectricPotentialNonCoupled.H"
-            }
+            #include "solveElectricPotentialNonCoupled.H"
         }
 
         runTime.write();

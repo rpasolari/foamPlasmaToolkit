@@ -28,7 +28,7 @@
 
     PoissonEquation.relax();
 
-    fvOptions.constrain(PoissonEquation);
+    fvOptionsFluid[i].constrain(PoissonEquation);
 
     if(coupled)
     {
@@ -39,11 +39,20 @@
         Info<< "\nSolving for ePotential in region " 
             << fluidRegions[i].name() << endl;
 
-        auto sp = PoissonEquation.solve();
-        ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
+        for (int nonOrth = 0; nonOrth <= nNonOrthoCorrFluid[i]; ++nonOrth)
+        {
+            auto sp = PoissonEquation.solve();
 
-        fvOptions.correct(ePotential);
+            if (nonOrth == 0)
+            {
+                ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
+            }
 
-        ePotential.correctBoundaryConditions();
+            if (nonOrth == nNonOrthoCorrFluid[i])
+            {
+                fvOptionsFluid[i].correct(ePotential);
+                ePotential.correctBoundaryConditions();
+            }
+        }
     }
 }

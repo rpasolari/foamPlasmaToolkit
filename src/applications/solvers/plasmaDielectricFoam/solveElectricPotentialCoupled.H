@@ -12,42 +12,52 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-forAll(fluidRegions, i)
+for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 {
-    fvMesh& mesh = fluidRegions[i];
-    #include "setRegionFluidFields.H"
-    #include "PoissonEquation.H"
-}
+    forAll(fluidRegions, i)
+    {
+        fvMesh& mesh = fluidRegions[i];
+        #include "setRegionFluidFields.H"
+        #include "PoissonEquation.H"
+    }
 
-forAll(dielectricRegions, i)
-{
-    fvMesh& mesh = dielectricRegions[i];
-    #include "setRegionDielectricFields.H"
-    #include "LaplaceEquation.H"
-}
+    forAll(dielectricRegions, i)
+    {
+        fvMesh& mesh = dielectricRegions[i];
+        #include "setRegionDielectricFields.H"
+        #include "LaplaceEquation.H"
+    }
 
-Info<< "\nSolving for ePotential in coupled regions (monolithically)\n" << endl;
+    if (nonOrth == 0)
+    {
+        Info<< "Solving for ePotential in coupled regions (monolithic)"
+            << nl << endl;
+    }
 
-fvMatrixAssemblyPtr->solve();
+    fvMatrixAssemblyPtr->solve();
 
-forAll(fluidRegions, i)
-{
-    volScalarField& ePotential = ePotentialFluid[i];
-    fv::options& fvOptions = fvOptionsFluid[i];
+    if (nonOrth == nonOrthoCorrCoupled)
+    {
+        forAll(fluidRegions, i)
+        {
+            volScalarField& ePotential = ePotentialFluid[i];
 
-    fvOptions.correct(ePotential);
-    ePotential.correctBoundaryConditions();
-}
+            fvOptionsFluid[i].correct(ePotential);
+            ePotential.correctBoundaryConditions();
+        }
 
-forAll(dielectricRegions, i)
-{
-    volScalarField& ePotential = ePotentialDielectric[i];
+        forAll(dielectricRegions, i)
+        {
+            volScalarField& ePotential = ePotentialDielectric[i];
 
-    ePotential.correctBoundaryConditions();
+            ePotential.correctBoundaryConditions();
+        }
+    }
+
+    fvMatrixAssemblyPtr->clear();
 }
 
 Info<< "\n>>> Solved for ePotential in coupled regions" << endl;
-fvMatrixAssemblyPtr->clear();
 
 
 

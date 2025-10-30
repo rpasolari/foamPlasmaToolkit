@@ -34,6 +34,13 @@ This toolkit has been **tested and verified to work on**:
 - **Ubuntu 24.04 LTS**
 - **OpenFOAM v2412 (OpenCFD Ltd. release)**
 
+### Optional Dependencies
+
+- **PETSc** (for users who want PETSc-based solvers)
+
+> PETSc is not required for basic installation.
+> See [`docs/petsc.md`](docs/petsc.md) for setup instructions.
+
 ## Installation / Setup
 
 ### 1. Install OpenFOAM v2412 (required)
@@ -71,7 +78,7 @@ Activate the toolkit environment (so OpenFOAM can detect its extensions):
 source etc/bashrc
 ```
 
-:warning: **IMPORTANT:** To avoid having to run this manually every time,  add it to 
+:warning: **IMPORTANT:** To avoid having to run this manually every time, add it to 
 your `~/.bashrc` as shown below.
 
 Open the .bashrc file in the user's directory in an editor, e.g. by typing in a terminal window 

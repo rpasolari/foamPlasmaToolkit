@@ -252,6 +252,12 @@ public:
             const direction cmpt
         );
 
+        virtual void initEvaluate
+        (
+            const UPstream::commsTypes commsType =
+                UPstream::commsTypes::blocking
+        ) override;
+
         //- Final evaluation of patch values after matrix solve
         //- Ensures mixed-type update is applied using the computed coefficients
         virtual void evaluate
@@ -259,6 +265,7 @@ public:
             const Pstream::commsTypes commsType =
                 Pstream::commsTypes::buffered
         );
+
     // I-O
 
         //- Write dictionary entries

@@ -556,7 +556,6 @@ void coupledElectricPotentialFvPatchScalarField::updateCoeffs()
     UPstream::msgType(oldTag);  // Restore tag
 }
 
-
 void coupledElectricPotentialFvPatchScalarField::manipulateMatrix
 (
     fvMatrix<scalar>& matrix,
@@ -647,6 +646,16 @@ void coupledElectricPotentialFvPatchScalarField::manipulateMatrix
     }
 }
 
+void coupledElectricPotentialFvPatchScalarField::initEvaluate
+(
+    const UPstream::commsTypes commsType
+)
+{
+
+    this->setUpdated(false);
+
+    mixedFvPatchScalarField::initEvaluate(commsType);
+}
 
 void coupledElectricPotentialFvPatchScalarField::evaluate
 (

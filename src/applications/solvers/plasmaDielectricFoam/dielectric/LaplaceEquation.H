@@ -17,37 +17,37 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
+if (!coupled)
 {
-    fvScalarMatrix LaplaceEquation
-    (
-        fvm::laplacian(epsilon,ePotential)
-    );
+    Info<< "\nSolving for ePotential in region " 
+        << dielectricRegions[i].name() << endl;
 
-    LaplaceEquation.relax();
-
-    if(coupled)
+    for (int nonOrth = 0; nonOrth <= nNonOrthoCorrDielectric[i]; ++nonOrth)
     {
-        fvMatrixAssemblyPtr->addFvMatrix(LaplaceEquation);
-    }
-    else
-    {
-        Info<< "\nSolving for ePotential in region " 
-            << dielectricRegions[i].name() << endl;
+        fvScalarMatrix LaplaceEquation
+        (
+            fvm::laplacian(epsilon,ePotential)
+        );
 
-        for (int nonOrth = 0; nonOrth <= nNonOrthoCorrDielectric[i]; ++nonOrth)
+        LaplaceEquation.relax();
+
+        auto sp = LaplaceEquation.solve();
+
+        if (nonOrth == 0)
         {
-            auto sp = LaplaceEquation.solve();
-
-            if (nonOrth == 0)
-            {
-                ePotentialNonCoupledResidualDielectric[i] =
-                    sp.initialResidual();
-            }
-
-            if (nonOrth == nNonOrthoCorrDielectric[i])
-            {
-                ePotential.correctBoundaryConditions();
-            }
+            ePotentialNonCoupledResidualDielectric[i] 
+                = sp.initialResidual();
         }
-    }    
+    }
+}
+else
+{
+        fvScalarMatrix LaplaceEquation
+        (
+            fvm::laplacian(epsilon,ePotential)
+        );
+
+        LaplaceEquation.relax();
+
+        fvMatrixAssemblyPtr->addFvMatrix(LaplaceEquation);
 }

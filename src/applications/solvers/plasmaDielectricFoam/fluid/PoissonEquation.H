@@ -18,41 +18,47 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
+if (!coupled)
 {
-    fvScalarMatrix PoissonEquation
-    (
-          fvm::laplacian(epsilon,ePotential)
-        ==
-          -eCharge
-    );
+    Info<< "\nSolving for ePotential in region " 
+        << fluidRegions[i].name() << endl;
 
-    PoissonEquation.relax();
-
-    fvOptionsFluid[i].constrain(PoissonEquation);
-
-    if(coupled)
+    for (int nonOrth = 0; nonOrth <= nNonOrthoCorrFluid[i]; ++nonOrth)
     {
-        fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
-    }
-    else
-    {
-        Info<< "\nSolving for ePotential in region " 
-            << fluidRegions[i].name() << endl;
+        fvScalarMatrix PoissonEquation
+        (
+            fvm::laplacian(epsilon,ePotential)
+            ==
+            -eCharge
+        );
 
-        for (int nonOrth = 0; nonOrth <= nNonOrthoCorrFluid[i]; ++nonOrth)
+        PoissonEquation.relax();
+
+        fvOptions.constrain(PoissonEquation);
+
+        auto sp = PoissonEquation.solve();
+
+        if (nonOrth == 0)
         {
-            auto sp = PoissonEquation.solve();
-
-            if (nonOrth == 0)
-            {
-                ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
-            }
-
-            if (nonOrth == nNonOrthoCorrFluid[i])
-            {
-                fvOptionsFluid[i].correct(ePotential);
-                ePotential.correctBoundaryConditions();
-            }
+            ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
         }
     }
+
+    fvOptions.correct(ePotential);
 }
+else
+{
+        fvScalarMatrix PoissonEquation
+        (
+            fvm::laplacian(epsilon,ePotential)
+            ==
+            -eCharge
+        );
+
+        PoissonEquation.relax();
+
+        fvOptions.constrain(PoissonEquation);
+
+        fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
+}
+

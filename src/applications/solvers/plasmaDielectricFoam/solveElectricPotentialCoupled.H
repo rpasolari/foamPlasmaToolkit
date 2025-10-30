@@ -12,6 +12,15 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
+forAll(fluidRegions, i)
+{
+    ePotentialFluid[i].correctBoundaryConditions();
+}
+forAll(dielectricRegions, i)
+{
+    ePotentialDielectric[i].correctBoundaryConditions();
+}
+
 for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 {
     forAll(fluidRegions, i)
@@ -40,17 +49,7 @@ for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
     {
         forAll(fluidRegions, i)
         {
-            volScalarField& ePotential = ePotentialFluid[i];
-
-            fvOptionsFluid[i].correct(ePotential);
-            ePotential.correctBoundaryConditions();
-        }
-
-        forAll(dielectricRegions, i)
-        {
-            volScalarField& ePotential = ePotentialDielectric[i];
-
-            ePotential.correctBoundaryConditions();
+            fvOptionsFluid[i].correct(ePotentialFluid[i]);
         }
     }
 

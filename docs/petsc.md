@@ -19,7 +19,7 @@ This documentation and functionality rely on the following projects:
 
 This toolkit has been tested with:
 
-- **PETSc 3.24.4**
+- **PETSc 3.24.0**
 - **petsc4foam**
 - **OpenFOAM v2412 (OpenCFD Ltd.)**
 - **Ubuntu 24.04 LTS**
@@ -28,30 +28,18 @@ This toolkit has been tested with:
 
 ## 1. Installing PETSc
 
-### A. Go to ThirdParty directory and download PETSc 3.24.4
+### A. Go to ThirdParty directory and download PETSc
 
 ```bash
 foam
 cd ThirdParty
 ```
 
-#### Option I - Clone PETSc 3.24.4 using Git
-
 ```bash
-git clone -b release https://gitlab.com/petsc/petsc.git petsc-3.24.4
-cd petsc-3.24.4
-git checkout v3.24.4    # pin exactly to v3.24.4
+git clone -b release https://gitlab.com/petsc/petsc.git petsc-3.24.0
+cd petsc-3.24.0
+git checkout v3.24.0    # pin exactly to v3.24.0
 ```
-
-#### Option II - Download PETSc 3.24.4
-
-```bash
-wget https://gitlab.com/petsc/petsc/-/archive/v3.24.4/petsc-v3.24.4.tar.gz
-tar -xvf petsc-v3.24.4.tar.gz
-mv petsc-v3.24.4 petsc-3.24.4
-cd petsc-3.24.4
-```
-
 ### B. Clean old builds
 
 ```bash
@@ -65,21 +53,22 @@ rm -rf DPInt32-cuda
 
 ```bash
 ./configure \
-  --with-cuda=0 \
   --with-shared-libraries=1 \
   --with-precision=double \
   --with-debugging=0 \
   --with-cc=mpicc \
   --with-cxx=mpicxx \
   --with-fc=mpif90 \
+  --with-mpi=1 \
   --download-fblaslapack \
   --download-metis \
   --download-parmetis \
   --download-superlu_dist \
-  --with-hypre=1 \
-  --with-petsc-arch=DPInt32 \
+  --download-hypre \
+  --with-petsc-arch=DPInt32-cuda \
   COPTFLAGS="-O3" \
-  CXXOPTFLAGS="-O3"
+  CXXOPTFLAGS="-O3" \
+  CUDAOPTFLAGS="-O3"
 ```
 
 #### II. Configure with CUDA
@@ -87,45 +76,41 @@ rm -rf DPInt32-cuda
 :warning: **IMPORTANT:** Before configuring, **CUDA Toolkit** must be installed.
 > See [`docs/cuda.md`](docs/cuda.md) for setup instructions.
 
+:information_source: **GPU Compute Capability Required**
+
+The flag `--with-cuda-arch=<value>` must match the **SM architecture** of your GPU.  
+See NVIDIA's Compute Capability list here:  
+https://developer.nvidia.com/cuda-gpus  
+
+Example:
+- RTX 5090 / 5080 / 5070 / 5060 / 5050 → `--with-cuda-arch=120` (Blackwell)
+- RTX 4090 / 4080 / 4070 / 4060 / 4050 → `--with-cuda-arch=89` (Ada Lovelace)
+
 ```bash
 ./configure \
   --with-cuda=1 \
   --with-cudac=nvcc \
   --with-cuda-dir=/usr/local/cuda-12.8 \
+  --with-cuda-arch=120 \
   --with-shared-libraries=1 \
   --with-precision=double \
   --with-debugging=0 \
   --with-cc=mpicc \
   --with-cxx=mpicxx \
   --with-fc=mpif90 \
+  --with-mpi=1 \
   --download-fblaslapack \
   --download-metis \
   --download-parmetis \
   --download-superlu_dist \
-  --with-hypre=1 \
+  --download-hypre \
   --with-petsc-arch=DPInt32-cuda \
   COPTFLAGS="-O3" \
   CXXOPTFLAGS="-O3" \
   CUDAOPTFLAGS="-O3"
 ```
 
-### D. Build and check
-
-#### I. Without CUDA
-
-```bash
-make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 all -j$(nproc)
-make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 check
-```
-
-#### II. With CUDA
-
-```bash
-make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda all -j$(nproc)
-make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda check
-```
-
-#### E. Add PETSc to Environment
+#### D. Add PETSc to Environment
 
 Open the .bashrc file in the user's directory in an editor, e.g. by typing in a terminal window 
 (note the dot):
@@ -139,7 +124,7 @@ Then add the following lines:
 #### I. Without CUDA
 
 ```bash
-export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24
+export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
 export PETSC_ARCH=DPInt32
 export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 ```
@@ -147,15 +132,44 @@ export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 #### II. With CUDA
 
 ```bash
-export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24
+export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
 export PETSC_ARCH=DPInt32-cuda
 export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
+```
+
+:warning: **IMPORTANT: WSL2 GPU Notice**  
+
+When using **OpenFOAM + PETSc with CUDA under WSL2**, you probably need to disable CUDA-aware shared-memory MPI.
+WSL2 does **not fully support CUDA IPC / pinned memory**, which can cause crashes.
+
+Add this to your terminal or `~/.bashrc`:
+
+```bash
+export OMPI_MCA_btl=^smcuda
+export OMPI_MCA_pml=ob1
+export OMPI_MCA_opal_cuda_support=true
 ```
 
 Reload:
 
 ```bash
 source ~/.bashrc
+```
+
+### E. Build and check
+
+#### I. Without CUDA
+
+```bash
+make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 all -j$(nproc)
+make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 check
+```
+
+#### II. With CUDA
+
+```bash
+make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda all -j$(nproc)
+make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda check
 ```
 
 ## 2. Installing petsc4foam
@@ -172,13 +186,14 @@ cd modules
 ```bash
 rm -rf external-solver
 git clone https://gitlab.com/petsc/petsc4foam.git external-solver
+git checkout v2406
 ```
 
 ### C. Make petsc4foam
 
 ```bash
 ./Allwclean
-./Allwmake
+./Allwmake -prefix=openfoam
 ```
 
 ### D. Confirm installation

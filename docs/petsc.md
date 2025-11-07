@@ -28,7 +28,7 @@ This toolkit has been tested with:
 
 ## 1. Installing PETSc
 
-### A. Go to ThirdParty directory and download PETSc
+### A. Go to ThirdParty directory (*OF Directory*) and download PETSc
 
 ```bash
 foam
@@ -44,12 +44,13 @@ git checkout v3.24.0    # pin exactly to v3.24.0
 
 ```bash
 make distclean >/dev/null 2>&1 || true
+rm -rf DPInt32
 rm -rf DPInt32-cuda
 ```
 
 ### C. Configure PETSc
 
-#### I. Configure without CUDA
+#### I. Configure *WITHOUT* CUDA
 
 ```bash
 ./configure \
@@ -65,13 +66,13 @@ rm -rf DPInt32-cuda
   --download-parmetis \
   --download-superlu_dist \
   --download-hypre \
-  --with-petsc-arch=DPInt32-cuda \
+  --with-petsc-arch=DPInt32 \
   COPTFLAGS="-O3" \
   CXXOPTFLAGS="-O3" \
   CUDAOPTFLAGS="-O3"
 ```
 
-#### II. Configure with CUDA
+#### II. Configure *WITH* CUDA
 
 :warning: **IMPORTANT:** Before configuring, **CUDA Toolkit** must be installed.
 > See [`docs/cuda.md`](docs/cuda.md) for setup instructions.
@@ -121,7 +122,7 @@ gedit ~/.bashrc
 
 Then add the following lines:
 
-#### I. Without CUDA
+#### I. *WITHOUT* CUDA
 
 ```bash
 export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
@@ -129,7 +130,7 @@ export PETSC_ARCH=DPInt32
 export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 ```
 
-#### II. With CUDA
+#### II. *WITH* CUDA
 
 ```bash
 export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
@@ -139,7 +140,8 @@ export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 
 :warning: **IMPORTANT: WSL2 GPU Notice**  
 
-When using **OpenFOAM + PETSc with CUDA under WSL2**, you probably need to disable CUDA-aware shared-memory MPI.
+When using **OpenFOAM + PETSc with CUDA under WSL2**, you probably need to disable CUDA-aware
+shared-memory MPI.
 WSL2 does **not fully support CUDA IPC / pinned memory**, which can cause crashes.
 
 Add this to your terminal or `~/.bashrc`:
@@ -158,14 +160,14 @@ source ~/.bashrc
 
 ### E. Build and check
 
-#### I. Without CUDA
+#### I. *WITHOUT* CUDA
 
 ```bash
 make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 all -j$(nproc)
 make PETSC_DIR=$PWD PETSC_ARCH=DPInt32 check
 ```
 
-#### II. With CUDA
+#### II. *WITH* CUDA
 
 ```bash
 make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda all -j$(nproc)
@@ -173,31 +175,37 @@ make PETSC_DIR=$PWD PETSC_ARCH=DPInt32-cuda check
 ```
 
 ## 2. Installing petsc4foam
+> **Note:** *`petsc4Foam` is automatically compiled during the build of the `foamPlasmaToolkit`
+**as long as PETSc is already installed on your system**. When you install the toolkit after
+installing PETSc, it will detect PETSc and build `petsc4Foam` automatically.*
 
-### A. Go to modules directory
+> *If the `foamPlasmaToolkit` was installed **before** PETSc, then `petsc4Foam` will not have been
+built. In that case, after installing PETSc manually (following the steps above), you need to
+compile `petsc4Foam` yourself by following the steps below.*
+
+⚠️ **IMPORTANT:** The `petsc4Foam` version included in the `foamPlasmaToolkit` is 
+**not the same** as the version available from the official upstream repository.  
+The toolkit version contains additional modifications that enable **implicit (monolithic) 
+multi-region coupling**, allowing multi-processing simulations to solve tightly coupled regions in a
+single PETSc system.  
+
+Therefore, even if you have installed the official petsc4Foam, you must use the version bundled with
+the `foamPlasmaToolkit` when performing multi-region implicit simulations (see below).
+
+### A. Go to petsc4Foam ThirdParty directory (foamPlasmaToolkit)
 
 ```bash
-foam
-cd modules
+cd $FOAM_PLASMA_THIRD_PARTY/petsc4Foam
 ```
 
-### B. Remove external-solver and clone from git
+
+### B. Build petsc4foam
 
 ```bash
-rm -rf external-solver
-git clone https://gitlab.com/petsc/petsc4foam.git external-solver
-git checkout v2406
-```
-
-### C. Make petsc4foam
-
-```bash
-./Allwclean
 ./Allwmake -prefix=openfoam
 ```
 
-### D. Confirm installation
-
+### C. Ensure that petsc4Foam is installed
 ```bash
 foamHasLibrary -verbose petscFoam   # should print: Can load "petscFoam"
 ```
@@ -214,6 +222,6 @@ libs
 );
 ```
 
-For usage examples, see the `foamPlasmaToolkit` [`tutorials`](tutorials) or the official `petsc4foam` tutorials
-at <https://gitlab.com/petsc/petsc4foam>.
+For usage examples, see the `foamPlasmaToolkit` [`tutorials`](tutorials) or the official
+`petsc4foam` tutorials at <https://gitlab.com/petsc/petsc4foam>.
 

@@ -1,0 +1,21 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwmake script for foamPlasmaMultiRun suite
+#  Builds all applications in src/applications
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Building Applications in src/applications"
+echo "----------------------------------------------"
+
+# Build solvers
+wmake solvers/electroPotentialFoam
+wmake solvers/electroPotentialMultiRegionFoam
+wmake solvers/plasmaDielectricFoam
+
+echo "----------------------------------------------"
+echo ">>> Done building applications."

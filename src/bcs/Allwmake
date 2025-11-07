@@ -1,0 +1,18 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwmake script for foamPlasmaMultiRun suite
+#  Builds all bcs in src/bcs
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Building bcs in src/bcs"
+echo "----------------------------------------------"
+
+wmake coupledElectricPotential/
+
+echo "----------------------------------------------"
+echo ">>> Done building bcs."

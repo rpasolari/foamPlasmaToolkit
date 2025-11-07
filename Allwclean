@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #---------------------------------------------
-#  Allwmake script for foamPlasmaMultiRun suite
-#  Builds all libraries and the solver
+#  Allwclean script for foamPlasmaMultiRun suite
+#  Cleans all libraries and the solver
 #---------------------------------------------
 
 # Set colors
@@ -15,32 +15,31 @@ set -e	# Exit on first error
 cd "${0%/*}" || exit 1
 
 # Libraries
-echo "Building Libraries..."
+echo "Cleaning Libraries..."
 echo "-------------------------------------"
 echo ""
 
-./src/bcs/Allwmake
+./src/bcs/Allwclean
 
 # Executables
 echo ""
 echo "-------------------------------------"
-echo "Building Executables..."
+echo "Cleaning Executables..."
 echo "-------------------------------------"
 echo ""
 
-./src/applications/Allwmake
-
+./src/applications/Allwclean
 
 # ThirdParty
-echo "Building ThirdParty..."
+echo ""
+echo "-------------------------------------"
+echo "Cleaning ThirdParty..."
 echo "-------------------------------------"
 echo ""
 
-./ThirdParty/Allwmake
+./ThirdParty/Allwclean
 
-echo
+echo ""
 echo "-------------------------------------"
-echo -e "${GREEN}Build complete.${NC}"
-echo "Libraries are in: \$FOAM_USER_LIBBIN ($FOAM_USER_LIBBIN)"
-echo "Solvers are in:   \$FOAM_USER_APPBIN ($FOAM_USER_APPBIN)"
+echo "Clean complete."
 echo "-------------------------------------"

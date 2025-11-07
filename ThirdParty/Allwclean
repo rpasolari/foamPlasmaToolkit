@@ -1,0 +1,22 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwclean script for foamPlasmaMultiRun suite
+#  Cleans all ThirdParty in ./ThirdParty
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Cleaning petsc4Foam"
+echo "----------------------------------------------"
+
+./petsc4Foam/Allwclean 
+
+echo ""
+echo ">>> Cleaning NEXT THIRD PARTY"
+echo "----------------------------------------------"
+
+echo "----------------------------------------------"
+echo ">>> Done cleaning ThirdParty."

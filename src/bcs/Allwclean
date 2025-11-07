@@ -1,0 +1,18 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwclean script for foamPlasmaMultiRun suite
+#  Cleans all bcs in src/bcs
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Cleaning bcs in src/bcs"
+echo "----------------------------------------------"
+
+wclean coupledElectricPotential/
+
+echo "----------------------------------------------"
+echo ">>> Done cleaning bcs."

@@ -1,3 +1,3 @@
 # TODO
-- Add a #includeEtc "caseDicts/setConstraintTypes" like file which will include
-  value even for processor type patches, for surfaceScalarFields like surfCharge
+- On top level Allwmake, set a variable that keeps all failed to compile libraries or applications
+and show them at the end.

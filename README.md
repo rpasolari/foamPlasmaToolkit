@@ -7,7 +7,8 @@ coupled electromagnetic effects.
 
 ##	Description
 
-This toolkit provides an evolving framework for implementing plasma physics features within OpenFOAM.  
+This toolkit provides an evolving framework for implementing plasma physics features within
+OpenFOAM.  
 It is designed for research and development purposes, focusing on modularity and compatibility with 
 the OpenFOAM v2412 (OpenCFD Ltd.).  
 
@@ -38,8 +39,10 @@ This toolkit has been **tested and verified to work on**:
 
 - **PETSc** (for users who want PETSc-based solvers)
 
-> PETSc is not required for basic installation.
-> See [`docs/petsc.md`](docs/petsc.md) for setup instructions.
+> PETSc is not required for the basic installation. See [`docs/petsc.md`](docs/petsc.md) for setup
+instructions. 
+Before installing PETSc and `petsc4Foam`, make sure that OpenFOAM is installed first by following
+the steps below.
 
 ## Installation / Setup
 
@@ -78,7 +81,7 @@ Activate the toolkit environment (so OpenFOAM can detect its extensions):
 source etc/bashrc
 ```
 
-:warning: **IMPORTANT:** To avoid having to run this manually every time, add it to 
+⚠️ **IMPORTANT:** To avoid having to run this manually every time, add it to 
 your `~/.bashrc` as shown below.
 
 Open the .bashrc file in the user's directory in an editor, e.g. by typing in a terminal window 

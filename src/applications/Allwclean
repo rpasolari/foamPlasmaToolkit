@@ -1,0 +1,21 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwclean script for foamPlasmaMultiRun suite
+#  Cleans all applications in src/applications
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Cleaning Applications in src/applications"
+echo "----------------------------------------------"
+
+# Solvers
+wclean solvers/electroPotentialFoam
+wclean solvers/electroPotentialMultiRegionFoam
+wclean solvers/plasmaDielectricFoam
+
+echo "----------------------------------------------"
+echo ">>> Done cleaning applications."

@@ -1,0 +1,53 @@
+#!/bin/bash
+#---------------------------------------------
+#  Allwmake script for foamPlasmaMultiRun suite
+#  Builds all ThirdParty in ./ThirdParty
+#---------------------------------------------
+
+set -e
+
+cd "${0%/*}" || exit 1
+
+# Colors
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+NC='\033[0m'   # No Color
+
+# Array to track failures
+FAILED=()
+
+echo ">>> Building petsc4Foam"
+echo "----------------------------------------------"
+
+if ./petsc4Foam/Allwmake -prefix=openfoam; then
+    echo -e "${GREEN}>>> petsc4Foam built successfully${NC}"
+else
+    echo -e "${RED}>>> petsc4Foam build FAILED (ignored)${NC}"
+    FAILED+=("petsc4Foam")
+fi
+
+echo ""
+echo ">>> Building NEXT THIRD PARTY"
+echo "----------------------------------------------"
+
+# Example for next component
+# if ./Something/Allwmake; then
+#     echo -e "${GREEN}>>> Something built successfully${NC}"
+# else
+#     echo -e "${RED}>>> Something build FAILED (ignored)${NC}"
+#     FAILED+=("Something")
+# fi
+
+echo "----------------------------------------------"
+echo ">>> Done building ThirdParty."
+echo ""
+
+# Summary
+if [ ${#FAILED[@]} -eq 0 ]; then
+    echo -e "${GREEN}>>> All ThirdParty components built successfully.${NC}"
+else
+    echo -e "${RED}>>> These ThirdParty components FAILED to build:${NC}"
+    for item in "${FAILED[@]}"; do
+        echo -e "    ${RED}- $item${NC}"
+    done
+fi

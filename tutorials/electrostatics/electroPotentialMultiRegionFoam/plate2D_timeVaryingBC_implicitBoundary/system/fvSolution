@@ -19,8 +19,29 @@ solvers
 {
     ePotential
     {
-        solver          PCG;
-	    preconditioner  DIC;
+        solver petsc;
+
+        petsc
+        {
+            options
+            {
+                ksp_type  cg;
+                pc_type  hypre;
+                mat_type  aij;
+            }
+            caching
+            {
+                matrix
+                {
+                    update never;
+                }
+
+                preconditioner
+                {
+                    update never;
+                }
+            }
+        }
         tolerance       1e-9;
         relTol          0;
         maxIter         2000;

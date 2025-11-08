@@ -100,7 +100,7 @@ do
         redistributePar -reconstruct -region $region
 done
 
-# rm -r processor*
+rm -r processor*
 
 mv log.$(getApplication) log.$(getApplication).parallel
 

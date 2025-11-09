@@ -11,3 +11,6 @@ variables
 
 # Ignore tests folder
 /tests
+
+# Ignore TODO file
+/TODO.md

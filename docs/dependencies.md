@@ -52,7 +52,7 @@ Some tutorials require additional software not needed by the core toolkit.
 
 ---
 
-## 3. Python Dependencies
+## 4. Python Dependencies
 
 Some utilities and post-processing scripts in the `foamPlasmaToolkit` rely on a small set of Python packages. These are optional and only needed if you plan to use the Python-based tools.
 

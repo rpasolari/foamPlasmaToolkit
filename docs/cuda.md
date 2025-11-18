@@ -13,7 +13,7 @@ This guide follows the official NVIDIA installation documentation for CUDA and d
   <https://docs.nvidia.com/cuda/>
 
 - **NVIDIA CUDA Downloads**  
-  <https://developer.nvidia.com/cuda-downloads>
+  <https://developer.nvidia.com/cuda-toolkit-archive>
 
 - **NVIDIA Driver Downloads**  
   <https://www.nvidia.com/Download/index.aspx>
@@ -62,21 +62,29 @@ If you prefer manual installation or need a specific driver version, see the off
 
 ➡ https://www.nvidia.com/Download/index.aspx
 
-## 2. Install CUDA Toolkit 12.8
+## 2. Install CUDA Toolkit
+
+⚠️ **IMPORTANT:** CUDA version 12.8 has been tested. Other versions may work but are not guaranteed.
 
 ### Option A — Ubuntu Native
+
+If you are using **Ubuntu 24.04 LTS** and want to install **CUDA 12.8**, follow the commands below. Otherwise, visit the **[CUDA Toolkit Archive](https://developer.nvidia.com/cuda-toolkit-archive)** and select the appropriate version for your system.
+
 
 ```bash
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
 sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-1_amd64.deb
+wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
 sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
 sudo apt-get update
 sudo apt-get -y install cuda-toolkit-12-8
 ```
 
 ### Option B — WSL (If installing inside WSL2)
+
+If you are using **Ubuntu 24.04 LTS** and want to install **CUDA 12.8**, follow the commands below. Otherwise, visit the **[CUDA Toolkit Archive](https://developer.nvidia.com/cuda-toolkit-archive)** and select the appropriate version for your system.
+
 ```bash
 wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
 sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -89,8 +97,7 @@ sudo apt-get -y install cuda-toolkit-12-8
 
 ## 3. Add CUDA to Environment
 
-Open the .bashrc file in the user's directory in an editor, e.g. by typing in a terminal window 
-(note the dot):
+Open the `.bashrc` file in your home directory using a text editor (note the leading dot):
 
 ```bash
 gedit ~/.bashrc
@@ -102,6 +109,8 @@ Then add the following lines:
 export PATH=/usr/local/cuda-12.8/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64:$LD_LIBRARY_PATH
 ```
+
+⚠️ **IMPORTANT:** Adjust the paths to match the CUDA version you installed and its installation location.
 
 Reload:
 

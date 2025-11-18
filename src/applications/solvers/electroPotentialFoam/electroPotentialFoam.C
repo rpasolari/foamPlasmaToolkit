@@ -39,6 +39,7 @@ Author
 
 #include "fvCFD.H"
 #include "fvOptions.H"
+#include "foamPlasmaToolkitConstants.H"
 
 int main(int argc, char *argv[])
 {

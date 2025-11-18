@@ -109,8 +109,7 @@ forAll(dielectricRegions, i)
         new dimensionedScalar
         (
             "epsilonDielectric",
-            dimensionSet(-1,-3,4,0,0,2,0),
-            epsilonRDielectric[i] * 8.8541878128e-12
+            epsilonRDielectric[i] * constant::plasma::epsilon0
         )
     );
 }

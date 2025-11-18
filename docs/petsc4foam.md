@@ -24,16 +24,16 @@ This toolkit has been tested with:
 
 ### 1. Go to ThirdParty directory (*OF Directory*) and download PETSc
 
-```bash
-foam
-cd ThirdParty
-```
+If OpenFOAM is installed in your `$HOME` directory as described in  
+[`README.md`](../README.md), run:
 
 ```bash
+cd ~/OpenFOAM/ThirdParty-v2412
 git clone -b release https://gitlab.com/petsc/petsc.git petsc-3.24.0
 cd petsc-3.24.0
 git checkout v3.24.0    # pin exactly to v3.24.0
 ```
+
 ### 2. Clean old builds
 
 ```bash
@@ -41,11 +41,11 @@ make distclean >/dev/null 2>&1 || true
 rm -rf DPInt32
 rm -rf DPInt32-cuda
 ```
-⚠️ IMPORTANT: If your OpenFOAM installation is in a system-protected directory, you may need to run these commands with sudo.
+⚠️ IMPORTANT: If your OpenFOAM installation is in a system-protected directory, you may need to run these commands with `sudo`.
 
 ### 3. Configure PETSc
 
-#### A. Configure — **NO CUDA**
+#### A. Configure - **NO CUDA**
 
 ```bash
 ./configure \
@@ -67,10 +67,10 @@ rm -rf DPInt32-cuda
   CUDAOPTFLAGS="-O3"
 ```
 
-#### B. Configure — **WITH CUDA**
+#### B. Configure - **WITH CUDA**
 
 ⚠️ **IMPORTANT:** Before configuring, **CUDA Toolkit** must be installed.
-> See [`docs/cuda.md`](docs/cuda.md) for setup instructions.
+> See [`docs/cuda.md`](./cuda.md) for setup instructions.
 
 ℹ️ **GPU Compute Capability Required**
 
@@ -117,23 +117,23 @@ Then add the following lines:
 #### A. **NO CUDA**
 
 ```bash
-export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
+export PETSC_DIR=$HOME/OpenFOAM/ThirdParty-v2412/petsc-3.24.0
 export PETSC_ARCH=DPInt32
 export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 ```
 
-⚠️ **IMPORTANT:** Replace the `/opt/openfoam2412/` with the actual path of your OpenFOAM installation.
+⚠️ **IMPORTANT:** Replace `$HOME/OpenFOAM/ThirdParty-v2412/petsc-3.24.0` with the actual path of your OpenFOAM installation.
 
-#### B. *WITH* CUDA
+#### B. WITH CUDA
 
 ```bash
-export PETSC_DIR=/opt/openfoam2412/ThirdParty/petsc-3.24.0
+export PETSC_DIR=$HOME/OpenFOAM/ThirdParty-v2412/petsc-3.24.0
 export PETSC_ARCH=DPInt32-cuda
 export LD_LIBRARY_PATH=$PETSC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
 ```
-⚠️ **IMPORTANT:** Replace the `/opt/openfoam2412/` with the actual path of your OpenFOAM installation.
+⚠️ **IMPORTANT:** Replace `$HOME/OpenFOAM/ThirdParty-v2412/petsc-3.24.0` with the actual path of your OpenFOAM installation.
 
-:warning: **IMPORTANT: WSL2 GPU Notice**  
+⚠️ **IMPORTANT: WSL2 GPU Notice**  
 
 When using **OpenFOAM + PETSc with CUDA under WSL2**, you probably need to disable CUDA-aware shared-memory MPI. WSL2 does **not fully support CUDA IPC / pinned memory**, which can cause crashes.
 
@@ -175,20 +175,20 @@ Therefore, even if you have installed the official petsc4Foam, you must use the 
 cd $FOAM_PLASMA_THIRD_PARTY/petsc4Foam
 ```
 
-### B. Build petsc4foam
+### 2. Build petsc4foam
 
 ```bash
 ./Allwmake -prefix=openfoam
 ```
 
-### C. Ensure that petsc4Foam is installed
+### 3. Ensure that petsc4Foam is installed
 ```bash
 foamHasLibrary -verbose petscFoam   # should print: Can load "petscFoam"
 ```
 
-## 3. Use petsc4foam
+## 4. Use petsc4foam
 
-⚠️ **IMPORTANT:** Add libpetscFoam.so to the optional keyword entry libs of the controlDict file:
+⚠️ **IMPORTANT:** Add `libpetscFoam.so` to the optional keyword entry libs of the controlDict file:
 
 ```bash
 libs
@@ -197,5 +197,5 @@ libs
 );
 ```
 
-For usage examples, see the `foamPlasmaToolkit` [`tutorials`](tutorials) or the official `petsc4foam` tutorials at <https://gitlab.com/petsc/petsc4foam>.
+For usage examples, see the `foamPlasmaToolkit` [`tutorials`](../tutorials) or the official `petsc4foam` tutorials at <https://gitlab.com/petsc/petsc4foam>.
 

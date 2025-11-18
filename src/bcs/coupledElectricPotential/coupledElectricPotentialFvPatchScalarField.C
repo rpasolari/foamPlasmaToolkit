@@ -20,6 +20,7 @@
 #include "mappedPatchBase.H"
 #include "IOField.H"
 #include "mappedPatchFieldBase.H"
+#include "foamPlasmaToolkitConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -318,9 +319,9 @@ coupledElectricPotentialFvPatchScalarField::epsilon
     const IOdictionary& propertiesDict =
         this->db().lookupObject<IOdictionary>("properties");
     
-    static const scalar epsilon0 = 8.8541878128e-12;
-
     scalar epsilonR = propertiesDict.lookupOrDefault("dielectricConstant", 1.0);
+
+    scalar epsilon0 = constant::plasma::epsilon0.value();
     
     tmp<scalarField> te(new scalarField(phiP.size(), epsilon0*epsilonR));
 

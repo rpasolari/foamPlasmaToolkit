@@ -44,7 +44,7 @@ volScalarField eCharge
     mesh
 );
 
-// --- Read material properties
+// Read material properties
 Info << "   Reading material's permittivity\n" << endl;
 IOdictionary propertiesDict
 (
@@ -68,8 +68,7 @@ Info<< "   Material relative permittivity: " << epsilonR << nl;
 dimensionedScalar epsilon
 (
     "epsilon",
-    dimensionSet(-1,-3,4,0,0,2,0),     // C^2/(N·m^2) = F/m
-    epsilonR * 8.8541878128e-12
+    epsilonR * constant::plasma::epsilon0
 );
 
 // ePotentialControls

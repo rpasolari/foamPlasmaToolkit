@@ -38,6 +38,7 @@ Author
     Contact: r.pasolari@gmail.com
 \*---------------------------------------------------------------------------*/
 
+#include "foamPlasmaToolkitConstants.H"
 #include "fvCFD.H"
 #include "regionProperties.H"
 #include "coordinateSystem.H"

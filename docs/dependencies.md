@@ -11,6 +11,7 @@ The toolkit has been tested on the following configurations:
 | Ubuntu Version | OpenFOAM Version (OpenCFD Ltd.) |
 |----------------|---------------------------------|
 | 24.04 LTS      | v2412                           |
+| 22.04 LTS      | v2412                           |
 
 Additional Linux distributions and OpenFOAM (OpenCFD Ltd.) versions may work, but are not officially validated at this time.
 
@@ -66,7 +67,7 @@ Some utilities and post-processing scripts in the `foamPlasmaToolkit` rely on a 
 | **pandas**     | Data handling for analysis     | 2.3.3          |
 | **gmsh**       | Mesh generation for specific tutorials | 4.15.0 |
 
-These packages are listed in the file: [`docs/python_dependencies.txt`](docs/python_dependencies.txt)
+These packages are listed in the file: [`docs/python_dependencies.txt`](./python_dependencies.txt)
 
 ### Installing the Python Dependencies
 
@@ -87,4 +88,4 @@ conda install --file docs/python_dependencies.txt
 ## 5. Notes
 
 - Optional dependencies should only be installed if you need the corresponding features.  
-- PETSc and petsc4Foam require correct linking with your OpenFOAM installation; see   [`docs/petsc.md`](docs/petsc.md) and [`docs/petsc4foam.md`](petsc4foam.md) for details.
+- PETSc and petsc4Foam require correct linking with your OpenFOAM installation; see [`docs/petsc4foam.md`](./petsc4foam.md) for details.

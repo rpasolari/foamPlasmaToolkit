@@ -47,6 +47,7 @@ The toolkit has been tested on the following configurations:
 | Ubuntu Version | OpenFOAM Version (OpenCFD Ltd.) |
 |----------------|---------------------------------|
 | 24.04 LTS      | v2412                           |
+| 22.04 LTS      | v2412                           |
 
 Additional Linux distributions and OpenFOAM (OpenCFD Ltd.) versions may work, but are not officially validated at this time.
 
@@ -54,32 +55,126 @@ Additional Linux distributions and OpenFOAM (OpenCFD Ltd.) versions may work, bu
 
 ## Installation / Setup
 
-### 1. Install OpenFOAM v2412 (required)
+## 1. Install Required Dependencies
+
+Before installing OpenFOAM and the foamPlasmaToolkit, make sure all required dependencies are installed. Refer to **[`docs/dependencies.md`](docs/dependencies.md)** and install all packages marked as *required*.
+
+
+## 2. Install OpenFOAM v2412 (required)
 
 This toolkit is designed **for OpenFOAM v2412 (OpenCFD Ltd.)**. It has not been tested in other  versions.
 
-If OpenFOAM is not already installed, follow the official installation instructions from OpenCFD:
+If you already have OpenFOAM installed, skip to **Step 2 (Download and build foamPlasmaToolkit)**.
 
-➡ https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled
 
-Once installed, ensure OpenFOAM is correctly loaded in your terminal:
+### A. Install OpenFOAM prerequisites
 
 ```bash
-source /opt/openfoam2412/etc/bashrc
+sudo apt-get update
+sudo apt-get install build-essential autoconf autotools-dev cmake gawk gnuplot
+sudo apt-get install flex libfl-dev libreadline-dev zlib1g-dev openmpi-bin libopenmpi-dev mpi-default-bin mpi-default-dev
+sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev
+sudo apt-get install libfftw3-dev libscotch-dev libptscotch-dev libboost-system-dev libboost-thread-dev libcgal-dev
+```
+
+### B. Get the source code
+
+Choose the directory where you want OpenFOAM v2412 to be installed.
+
+Common system-wide installation paths are:
+
+- `/usr/lib/openfoam/openfoam2412/`
+- `/opt/openfoam2412/`
+
+However, both locations require **sudo** privileges. This can be inconvenient when compiling ThirdParty packages or running tests, as some steps may require elevated permissions.
+
+To avoid this, you can install OpenFOAM in your **home directory**, which allows you to compile and work without using `sudo`.
+
+#### Example: Install OpenFOAM v2412 in your home directory
+
+```bash
+cd ~
+mkdir OpenFOAM
+cd OpenFOAM
+```
+
+You can download the official OpenFOAM v2412 source code directly from **openfoam.com**:
+
+```bash
+wget -O -  http://dl.openfoam.com/source/v2412/OpenFOAM-v2412.tgz | tar xvz
+wget -O -  http://dl.openfoam.com/source/v2412/ThirdParty-v2412.tgz | tar xvz
+```
+
+If `wget` fails to establish a connection, you can download the archives manually from the official mirrors and extract them into your chosen OpenFOAM directory.
+
+Manual download links:
+
+- [OpenFOAM-v2412.tgz (source code)](https://sourceforge.net/projects/openfoam/files/v2412/OpenFOAM-v2412.tgz/download)  
+- [ThirdParty-v2412.tgz (third-party libraries)](https://sourceforge.net/projects/openfoam/files/v2412/ThirdParty-v2412.tgz/download)
+
+
+After downloading, extract both archives inside your OpenFOAM installation folder:
+
+```bash
+tar -xvzf OpenFOAM-v2412.tgz
+tar -xvzf ThirdParty-v2412.tgz
+```
+
+### C. Set the environment variables
+
+Open the `.bashrc` file in your home directory with your preferred editor (note the leading dot):
+
+```bash
+nano ~/.bashrc
+# or
+gedit ~/.bashrc
+```
+
+Add the following line at the end of the file:
+
+```bash
+source $HOME/OpenFOAM/OpenFOAM-v2412/etc/bashrc
+```
+
+Save the file, then reload your shell configuration:
+
+```bash
+source ~/.bashrc
+```
+
+### D. Install ThirdPart and OpenFOAM
+
+First, install the ThirdParty packages:
+
+```bash
+cd ~/OpenFOAM/ThirdParty-v2412
+./Allwmake -j
+```
+
+After the ThirdParty build completes, install OpenFOAM itself:
+
+```bash
+cd ~/OpenFOAM/OpenFOAM-v2412
+./Allwmake -j
+```
+
+When the compilation finishes, verify that OpenFOAM is correctly installed:
+
+```bash
 foamVersion   # should print: OpenFOAM-v2412
 ```
 
-### 2. Download foamPlasmaToolkit
+## 3. Install foamPlasmaToolkit
 
-Download the toolkit by cloning the GitHub repository:
+### A. Get the source code
+
+Choose the directory where you want to install **foamPlasmaToolkit**, then download the toolkit by cloning the GitHub repository.
+
+#### Example: Install foamPlasmaToolkit in your home directory
 
 ```bash
+cd ~
 git clone https://github.com/rpasolari/foamPlasmaToolkit.git
-```
-
-Enter the toolkit directory:
-
-```bash
 cd foamPlasmaToolkit
 ```
 
@@ -90,30 +185,41 @@ source etc/bashrc
 
 ⚠️ **IMPORTANT:** To avoid having to run this manually every time, add it to your `~/.bashrc` as shown below.
 
-Open the .bashrc file in the user's directory in an editor, e.g. by typing in a terminal window(note the dot):
+Open the `.bashrc` file in your home directory using any text editor (note the leading dot):
 
 ```bash
 gedit ~/.bashrc
 ```
 
-Then add the following line at the end of the file (change the path to match where you installed the toolkit, e.g. /home/USERNAME):
+Then add the following line at the end of the file (adjust the path to match where you installed the toolkit):
 
 ```bash
-source /ABSOLUTE_PATH_TO_FOAMPLASMATOOLKIT/etc/bashrc
+source $HOME/foamPlasmaToolkit/etc/bashrc
 ```
+
+Save the file, then reload your shell configuration:
+
+```bash
+source ~/.bashrc
+```
+
 To verify that the environment was successfully loaded, open a **new terminal** and run:
 
 ```bash
-echo $FOAM_PLASMA
+echo $FOAM_PLASMA   # should print the toolkit folder
 ```
 
-### 3. Build foamPlasmaToolkit
+### B. Build foamPlasmaToolkit
 From inside the foamPlasmaToolkit directory, compile everything:
 
 ```bash
 ./Allwmake
 ```
 If the compilation finishes without errors, the installation is complete.
+
+⚠️ **IMPORTANT:** Some ThirdParty packages included with the foamPlasmaToolkit (but not required as prerequisites) may fail to build (for example, **petsc4foam**). To install these optional components, refer to the corresponding instructions in the `docs/` directory.
+
+
 
 ##	Contributions
 

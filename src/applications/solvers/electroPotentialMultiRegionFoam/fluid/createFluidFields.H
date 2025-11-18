@@ -129,8 +129,7 @@ forAll(fluidRegions, i)
         new dimensionedScalar
         (
             "epsilonFluid",
-            dimensionSet(-1,-3,4,0,0,2,0),
-            epsilonRFluid[i] * 8.8541878128e-12
+            epsilonRFluid[i] * constant::plasma::epsilon0
         )
     );
 }

@@ -1,0 +1,5 @@
+plasmaTransport/plasmaTransport.C
+plasmaTransportModels/plasmaTransportModel.C
+plasmaTransportModels/noneTransportModel/noneTransportModel.C
+
+LIB = $(FOAM_USER_LIBBIN)/libplasmaTransport

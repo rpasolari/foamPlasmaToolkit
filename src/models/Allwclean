@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#---------------------------------------------
+#  Allwclean script for foamPlasmaToolkit suite
+#  Cleans all models in src/models
+#---------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Cleaning models in src/models"
+echo "----------------------------------------------"
+
+./plasmaModels/Allwclean
+
+echo "----------------------------------------------"
+echo ">>> Done cleaning models."

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#----------------------------------------------------
+#  Allwmake script for foamPlasmaToolkit suite
+#  Builds all plasmaModels in src/models/plasmaModels
+#----------------------------------------------------
+
+set -e
+
+# Move to the directory where this script is located
+cd "${0%/*}" || exit 1
+
+echo ">>> Building plasmaModels in src/models/plasmaModels"
+echo "-----------------------------------------------------"
+
+wmake libso plasmaSpecies 
+wmake libso plasmaTransport
+
+echo "-----------------------------------------------------"
+echo ">>> Done building plasmaModels."

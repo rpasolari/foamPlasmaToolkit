@@ -1,0 +1,159 @@
+/*---------------------------------------------------------------------------*\
+License
+    This file is part of the foamPlasmaToolkit.
+
+    The foamPlasmaToolkit is not part of OpenFOAM but is developed using the
+    OpenFOAM framework and linked against OpenFOAM libraries.
+
+    Copyright (C) 2025
+        Rention Pasolari
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::plasmaSpecies
+    
+Description
+    Core class for plasma species data management.
+
+    This class provides the minimal data structures required to represent
+    plasma species in OpenFOAM-based plasma simulations. It defines which
+    species exist, their basic properties (e.g. charge number), and
+    constructs and owns the corresponding volume fields such as number
+    density.
+
+    plasmaSpecies does not implement any physical models (transport,
+    reactions, electron energy, etc.). Instead, it acts as a central storage
+    and access point for all species-related quantities. Other physics
+    modules operate on these fields but do not create their own copies.
+
+    Only a single plasmaSpecies object should exist on a given mesh.
+    It is responsible for creating the species fields; additional modules
+    simply reference these fields to ensure consistency across the solver.
+
+    This class forms the foundation upon which transport models, reaction
+    models, and electrostatic models build their physics algorithms.
+
+SourceFiles
+    plasmaSpeciesI.H
+    plasmaSpecies.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef Foam_plasmaSpecies_H
+#define Foam_plasmaSpecies_H
+
+#include "IOdictionary.H"
+#include "fvMesh.H"
+#include "volFields.H"
+#include "HashTable.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                    Class basicPlasmaSpecies Declaration
+\*---------------------------------------------------------------------------*/
+
+class plasmaSpecies
+:
+    public IOdictionary
+{
+private:
+
+    //- Disallow copy
+    plasmaSpecies(const plasmaSpecies&) = delete;
+    void operator=(const plasmaSpecies&) = delete;
+
+protected:
+
+    // Protected Data
+
+        //- Mesh reference
+        const fvMesh& mesh_;
+
+        //- Species names
+        wordList speciesNames_;
+
+        //- Number of species
+        label nSpecies_;
+
+        //- Charge number Z_i per species (dimensionless:: -1, +1, +2, etc)
+        List<scalar> speciesCharge_;
+
+        //- Number density fiels n_i [1/m3] for each species
+        PtrList<volScalarField> numberDensity_;
+
+        //- Per-species property dictionaries
+        HashTable<dictionary> speciesDicts_;
+
+        //- Default species properties
+        dictionary defaultDict_;
+
+public:
+
+    //- Runtime type information
+    TypeName("plasmaSpecies");
+
+    // Constructors
+
+        //- Construct from mesh
+        plasmaSpecies
+        (
+            const fvMesh& mesh
+        );
+
+    //- Destructor
+    virtual ~plasmaSpecies() {}
+
+    // Access
+
+        inline const fvMesh& mesh() const;
+        inline const wordList& speciesNames() const;
+        inline label nSpecies() const;
+        inline const List<scalar>& speciesCharge() const;
+
+        // Number density access (single species)
+        inline const volScalarField& numberDensity(label i) const;
+        inline volScalarField& numberDensity(label i);
+
+        // Number density access (whole list)
+        inline const PtrList<volScalarField>& numberDensity() const;
+        inline PtrList<volScalarField>& numberDensity();
+
+        //- Access per-species dictionary (index)
+        inline const dictionary& speciesDict(label i) const;
+
+        //- Access per-species dictionary (name)
+        inline const dictionary& speciesDict(const word& name) const;
+
+        //- Access default dictionary
+        inline const dictionary& defaultDict() const { return defaultDict_; }
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "plasmaSpeciesI.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

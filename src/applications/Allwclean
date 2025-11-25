@@ -1,6 +1,7 @@
 #!/bin/bash
+
 #---------------------------------------------
-#  Allwclean script for foamPlasmaMultiRun suite
+#  Allwclean script for foamPlasmaToolkit suite
 #  Cleans all applications in src/applications
 #---------------------------------------------
 

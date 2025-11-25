@@ -5,7 +5,7 @@
 
   Description:
       Solves the Poisson/Laplace equations for the electric potential in all
-      regions (fluid + dielectric), in a non-coupled way (segregate).
+      regions (gas + dielectric), in a non-coupled way (segregate).
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later
@@ -22,16 +22,13 @@ for(int outer = 1; outer <= ePotentialNonCoupledLoopMaxIter; ++outer)
         << ePotentialNonCoupledLoopMaxIter << ")" << endl;
 
     // Reset residual lists each iteration
-    forAll(ePotentialNonCoupledResidualFluid, i)
-        ePotentialNonCoupledResidualFluid[i] = Foam::GREAT;
+    ePotentialNonCoupledResidual = Foam::GREAT;
 
-    forAll(ePotentialNonCoupledResidualDielectric, i)
-        ePotentialNonCoupledResidualDielectric[i] = Foam::GREAT;
+    forAll(ePotentialNonCoupledResidualDielectricList, i)
+        ePotentialNonCoupledResidualDielectricList[i] = Foam::GREAT;
 
-    forAll(fluidRegions, i)
     {
-        fvMesh& mesh = fluidRegions[i];
-        #include "setRegionFluidFields.H"
+        fvMesh& mesh = gasMesh();
         #include "PoissonEquation.H"
     }
 
@@ -45,24 +42,17 @@ for(int outer = 1; outer <= ePotentialNonCoupledLoopMaxIter; ++outer)
     // Check convergence
     bool allOK = true;
 
-    forAll(ePotentialNonCoupledResidualFluid, i)
+    if (ePotentialNonCoupledResidual >= ePotentialNonCoupledTolerance)
     {
-        if
-        (
-            ePotentialNonCoupledResidualFluid[i]
-            >= ePotentialNonCoupledToleranceFluid[i]
-        )
-        {
-            allOK = false;
-        }
+        allOK = false;
     }
 
-    forAll(ePotentialNonCoupledResidualDielectric, i)
+    forAll(ePotentialNonCoupledResidualDielectricList, i)
     {
         if
         (
-            ePotentialNonCoupledResidualDielectric[i]
-            >= ePotentialNonCoupledToleranceDielectric[i]
+            ePotentialNonCoupledResidualDielectricList[i]
+            >= ePotentialNonCoupledToleranceDielectricList[i]
         )
         {
             allOK = false;

@@ -12,14 +12,16 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-PtrList<volScalarField> ePotentialDielectric(dielectricRegions.size());
-PtrList<IOdictionary> propertiesDictDielectric(dielectricRegions.size());
-PtrList<surfaceScalarField> surfChargeDielectric(dielectricRegions.size());
-PtrList<dimensionedScalar> epsilonDielectric(dielectricRegions.size());
+PtrList<volScalarField> ePotentialDielectricList(dielectricRegions.size());
+PtrList<volVectorField> EDielectricList(dielectricRegions.size());
+PtrList<IOdictionary>
+    electricPropertiesDictDielectricList(dielectricRegions.size());
+PtrList<surfaceScalarField> surfChargeDielectricList(dielectricRegions.size());
+PtrList<dimensionedScalar> epsilonDielectricList(dielectricRegions.size());
 
-List<scalar> epsilonRDielectric(dielectricRegions.size());
+List<scalar> epsilonRDielectricList(dielectricRegions.size());
 
-List<scalar> ePotentialNonCoupledResidualDielectric
+List<scalar> ePotentialNonCoupledResidualDielectricList
 (
     dielectricRegions.size(), Foam::GREAT
 );
@@ -30,7 +32,7 @@ forAll(dielectricRegions, i)
          << dielectricRegions[i].name() << nl << endl;
 
     Info << "   Adding to ePotentialDielectric\n" << endl;
-    ePotentialDielectric.set
+    ePotentialDielectricList.set
     (
         i,
         new volScalarField
@@ -47,6 +49,30 @@ forAll(dielectricRegions, i)
         )
     );
 
+    Info << "   Adding to EDielectric\n" << endl;
+    EDielectricList.set
+    (
+        i,
+        new volVectorField
+        (
+            IOobject
+            (
+                "E",
+                runTime.timeName(),
+                dielectricRegions[i],
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            dielectricRegions[i],
+            dimensionedVector
+            (
+                "zero",
+                dimensionSet(1, 1, -3, 0, 0, -1, 0),
+                vector::zero
+            )
+        )
+    );
+
     {
         IOobject surfChargeHeader
         (
@@ -59,7 +85,7 @@ forAll(dielectricRegions, i)
 
         if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
         {
-            surfChargeDielectric.set
+            surfChargeDielectricList.set
             (
                 i,
                 new surfaceScalarField
@@ -76,12 +102,12 @@ forAll(dielectricRegions, i)
                 )
             );
 
-            regIOobject::store(&surfChargeDielectric[i]);
+            regIOobject::store(&surfChargeDielectricList[i]);
             Info << "   Adding to surfChargeDielectric\n" << endl;
         }
     }
 
-    propertiesDictDielectric.set
+    electricPropertiesDictDielectricList.set
     (
         i,
         new IOdictionary
@@ -97,19 +123,21 @@ forAll(dielectricRegions, i)
         )
     );
 
-    epsilonRDielectric[i] = propertiesDictDielectric[i].lookupOrDefault<scalar>
-    (
-        "dielectricConstant", 1.0
-    );
+    epsilonRDielectricList[i] =
+        electricPropertiesDictDielectricList[i].lookupOrDefault<scalar>
+        (
+            "dielectricConstant",
+            1.0
+        );
 
     Info << "   Adding material's permittivity\n" << endl;
-    epsilonDielectric.set
+    epsilonDielectricList.set
     (
         i,
         new dimensionedScalar
         (
             "epsilonDielectric",
-            epsilonRDielectric[i] * constant::plasma::epsilon0
+            epsilonRDielectricList[i] * constant::plasma::epsilon0
         )
     );
 }

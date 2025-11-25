@@ -24,8 +24,8 @@ Application
     plasmaDielectricFoam
 
 Description
-    Transient solver for coupled fluid and dielectric domains developed for
-    plasma simulation purposes.
+    Transient solver for coupled gas (plasma) and dielectric domains developed
+    for plasma simulation purposes.
 
 Usage
     \b plasmaDielectricFoam [OPTIONS]
@@ -48,12 +48,15 @@ Author
 #include "fvSolution.H"
 #include "solutionControl.H"
 
+#include "plasmaSpecies.H"
+#include "plasmaTransport.H"
+
 int main(int argc, char *argv[])
 {
     argList::addNote
     (
-        "Transient solver for coupled fluid and dielectric domains developed"
-        " for plasma simulation purposes."
+        "Transient solver for coupled gas (plasma) and dielectric domains"
+        " developed for plasma simulation purposes."
     );
 
     #define NO_CONTROL
@@ -78,6 +81,9 @@ int main(int argc, char *argv[])
 
         Info << "Time = " << runTime.timeName() << nl << endl;
         
+        // Update charge density (ρ = Z * e *n)
+        // #include "updateChargeDensity.H"
+
         // Solve the Poisson/Laplace Equation (electric potential)
         if(coupled)
         {
@@ -87,6 +93,9 @@ int main(int argc, char *argv[])
         {
             #include "solveElectricPotentialNonCoupled.H"
         }
+
+        // #include "calculateElectricField.H"
+
 
         runTime.write();
         runTime.printExecutionTime(Info);

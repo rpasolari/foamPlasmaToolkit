@@ -12,5 +12,5 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "createFluidFields.H"
+#include "createGasFields.H"
 #include "createDielectricFields.H"

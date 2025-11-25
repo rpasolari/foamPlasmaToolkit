@@ -1,11 +1,13 @@
 EXE_INC = \
-    -I./fluid \
+    -I./gas \
     -I./dielectric \
     -I./include \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/OpenFOAM/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/constants/lnInclude
+    -I$(FOAM_PLASMA_SRC)/constants/lnInclude \
+    -I$(FOAM_PLASMA_SRC)/models/plasmaModels/plasmaSpecies/lnInclude \
+    -I$(FOAM_PLASMA_SRC)/models/plasmaModels/plasmaTransport/lnInclude
 
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
@@ -14,5 +16,7 @@ EXE_LIBS = \
     -lmeshTools \
     -lOpenFOAM \
     -lregionModels \
-    -lfoamPlasmaToolkitConstants
+    -lfoamPlasmaToolkitConstants \
+    -lplasmaSpecies \
+    -lplasmaTransport
     

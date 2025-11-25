@@ -16,10 +16,10 @@
 
 #include "createMeshes.H"
 
-if (!fluidRegions.size() && !dielectricRegions.size())
+if (!dielectricRegions.size())
 {
     FatalErrorIn(args.executable())
         << "No region meshes present" << exit(FatalError);
 }
 
-fvMesh& mesh = fluidRegions.size() ? fluidRegions[0] : dielectricRegions[0];
+fvMesh& mesh = gasMesh().nCells() ? gasMesh() : dielectricRegions[0];

@@ -5,28 +5,24 @@
 
   Description:
       Solves the Poisson/Laplace equations for the electric potential in all
-      regions (fluid + dielectric), in a coupled way (monolithically). 
+      regions (gas + dielectric), in a coupled way (monolithically). 
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-forAll(fluidRegions, i)
-{
-    ePotentialFluid[i].correctBoundaryConditions();
-}
+ePotential.correctBoundaryConditions();
+
 forAll(dielectricRegions, i)
 {
-    ePotentialDielectric[i].correctBoundaryConditions();
+    ePotentialDielectricList[i].correctBoundaryConditions();
 }
 
 for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 {
-    forAll(fluidRegions, i)
     {
-        fvMesh& mesh = fluidRegions[i];
-        #include "setRegionFluidFields.H"
+        fvMesh& mesh = gasMesh();
         #include "PoissonEquation.H"
     }
 
@@ -47,10 +43,7 @@ for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 
     if (nonOrth == nonOrthoCorrCoupled)
     {
-        forAll(fluidRegions, i)
-        {
-            fvOptionsFluid[i].correct(ePotentialFluid[i]);
-        }
+        fvOptions.correct(ePotential);
     }
 
     fvMatrixAssemblyPtr->clear();

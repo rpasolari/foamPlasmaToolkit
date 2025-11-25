@@ -14,28 +14,11 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-IOdictionary plasmaControlsConfig
-(
-    IOobject
-    (
-        "plasmaControlsConfig",
-        runTime.system(),
-        runTime,
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE
-    )
-);
-
-bool coupled = plasmaControlsConfig.lookupOrDefault
-(
-    "coupledFieldsMonolithic", false
-);
+bool coupled = false;
 
 autoPtr<fvMatrix<scalar>> fvMatrixAssemblyPtr;
 
-forAll(fluidRegions, i)
 {
-    const volScalarField& ePotential = ePotentialFluid[i];
     forAll(ePotential.boundaryField(), patchI)
     {
         if (ePotential.boundaryField()[patchI].useImplicit())
@@ -47,34 +30,32 @@ forAll(fluidRegions, i)
 
 forAll(dielectricRegions, i)
 {
-    const volScalarField& ePotential = ePotentialDielectric[i];
-    forAll(ePotential.boundaryField(), patchI)
+    const volScalarField& ePotentialDielectric = ePotentialDielectricList[i];
+    forAll(ePotentialDielectric.boundaryField(), patchI)
     {
-        if (ePotential.boundaryField()[patchI].useImplicit())
+        if (ePotentialDielectric.boundaryField()[patchI].useImplicit())
         {
             coupled = true;
         }
     }
 }
 
-forAll(fluidRegions, i)
 {
-    if(coupled)
+    if (coupled)
     {
         Info<< "Regions are COUPLED; "
             << "ePotential will be solved MONOLITHICALLY." << nl
             << "Assembling ePotential fvMatrixAssembly from region "
-            << fluidRegions[i].name() << nl << endl;
+            << gasRegionName << nl << endl;
 
         fvMatrixAssemblyPtr.reset
         (
             new fvMatrix<scalar>
             (
-                ePotentialFluid[i],
+                ePotential,
                 dimensionSet(0,0,1,0,0,1,0)
             )
         );
-     break;
     }
 }
 
@@ -91,7 +72,7 @@ if (coupled && !fvMatrixAssemblyPtr)
         (
             new fvMatrix<scalar>
             (
-                ePotentialDielectric[i],
+                ePotentialDielectricList[i],
                 dimensionSet(0,0,1,0,0,1,0)
             )
         );

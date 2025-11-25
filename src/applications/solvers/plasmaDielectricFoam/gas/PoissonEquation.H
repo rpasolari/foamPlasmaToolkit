@@ -5,7 +5,7 @@
 
   Description:
       Solves the Poisson equation for the electric potential in the plasma
-      (fluid) regions:
+      (gas) region:
 
           ∇·(ε∇φ) = -ρ_e
 
@@ -21,15 +21,15 @@
 if (!coupled)
 {
     Info<< "\nSolving for ePotential in region " 
-        << fluidRegions[i].name() << endl;
+        << gasRegionName << endl;
 
-    for (int nonOrth = 0; nonOrth <= nNonOrthoCorrFluid[i]; ++nonOrth)
+    for (int nonOrth = 0; nonOrth <= nNonOrthoCorr; ++nonOrth)
     {
         fvScalarMatrix PoissonEquation
         (
             fvm::laplacian(epsilon,ePotential)
             ==
-            -eCharge
+            -chargeDensity
         );
 
         PoissonEquation.relax();
@@ -40,7 +40,7 @@ if (!coupled)
 
         if (nonOrth == 0)
         {
-            ePotentialNonCoupledResidualFluid[i] = sp.initialResidual();
+            ePotentialNonCoupledResidual = sp.initialResidual();
         }
     }
 
@@ -52,7 +52,7 @@ else
         (
             fvm::laplacian(epsilon,ePotential)
             ==
-            -eCharge
+            -chargeDensity
         );
 
         PoissonEquation.relax();
@@ -61,4 +61,3 @@ else
 
         fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
 }
-

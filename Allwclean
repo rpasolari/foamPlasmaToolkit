@@ -20,6 +20,8 @@ echo "-------------------------------------"
 echo ""
 
 ./src/bcs/Allwclean
+wclean src/constants
+./src/models/Allwclean
 
 # Executables
 echo ""

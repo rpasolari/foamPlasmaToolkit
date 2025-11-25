@@ -1,6 +1,7 @@
 #!/bin/bash
+
 #---------------------------------------------
-#  Allwmake script for foamPlasmaMultiRun suite
+#  Allwmake script for foamPlasmaToolkit suite
 #  Builds all applications in src/applications
 #---------------------------------------------
 

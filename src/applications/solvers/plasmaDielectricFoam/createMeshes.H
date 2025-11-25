@@ -14,5 +14,5 @@
 
 regionProperties rp(runTime);
 
-#include "createFluidMeshes.H"
+#include "createGasMesh.H"
 #include "createDielectricMeshes.H"

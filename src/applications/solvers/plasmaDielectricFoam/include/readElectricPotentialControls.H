@@ -17,34 +17,36 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-List<scalar> ePotentialNonCoupledToleranceFluid(fluidRegions.size());
-List<scalar> ePotentialNonCoupledToleranceDielectric(dielectricRegions.size());
+scalar ePotentialNonCoupledTolerance;
+int nNonOrthoCorr;
 
-List<int> nNonOrthoCorrFluid(fluidRegions.size());
-List<int> nNonOrthoCorrDielectric(dielectricRegions.size());
+List<scalar> ePotentialNonCoupledToleranceDielectricList
+(
+    dielectricRegions.size()
+);
+List<int> nNonOrthoCorrDielectricList(dielectricRegions.size());
 
 int nonOrthoCorrCoupled = 0;
 scalar ePotentialNonCoupledLoopMaxIter = 0;
 bool foundAnyRegionMaxIter = false;
 
-forAll(fluidRegions, i)
 {
-    const fvMesh& mesh = fluidRegions[i];
+    const fvMesh& mesh = gasMesh();
 
     const dictionary epCtrl =
         mesh.solutionDict().subDict("ePotentialControls");
 
-    // Always read — used by both coupled and segregated solve
-    nNonOrthoCorrFluid[i] =
+    // Always read - used by both coupled and segregated solve
+    nNonOrthoCorr =
         epCtrl.getOrDefault<int>("nNonOrthogonalCorrectors", 0);
 
-    nonOrthoCorrCoupled = max(nonOrthoCorrCoupled, nNonOrthoCorrFluid[i]);
+    nonOrthoCorrCoupled = max(nonOrthoCorrCoupled, nNonOrthoCorr);
 
     // Only used in segregated mode
     const dictionary nonCoupledCtrl =
         epCtrl.subOrEmptyDict("nonCoupledResidualControl");
 
-    ePotentialNonCoupledToleranceFluid[i] =
+    ePotentialNonCoupledTolerance =
         nonCoupledCtrl.getOrDefault<scalar>("tolerance", 1.0e-6);
 
     if (nonCoupledCtrl.found("maxIter"))
@@ -64,15 +66,19 @@ forAll(dielectricRegions, i)
     const dictionary epCtrl =
         mesh.solutionDict().subDict("ePotentialControls");
 
-    nNonOrthoCorrDielectric[i] =
+    nNonOrthoCorrDielectricList[i] =
         epCtrl.getOrDefault<int>("nNonOrthogonalCorrectors", 0);
 
-    nonOrthoCorrCoupled = max(nonOrthoCorrCoupled, nNonOrthoCorrDielectric[i]);
+    nonOrthoCorrCoupled = max
+    (
+        nonOrthoCorrCoupled,
+        nNonOrthoCorrDielectricList[i]
+    );
 
     const dictionary nonCoupledCtrl =
         epCtrl.subOrEmptyDict("nonCoupledResidualControl");
 
-    ePotentialNonCoupledToleranceDielectric[i] =
+    ePotentialNonCoupledToleranceDielectricList[i] =
         nonCoupledCtrl.getOrDefault<scalar>("tolerance", 1.0e-6);
 
     if (nonCoupledCtrl.found("maxIter"))
@@ -97,18 +103,16 @@ if (!coupled)
     Info<< "*** Segregated electric potential controls:" << nl
         << "   - Max iterations: " << ePotentialNonCoupledLoopMaxIter << nl;
 
-    forAll(fluidRegions, i)
-    {
-        Info<< "   - (Fluid region) " << fluidRegions[i].name()
-            << " : nNonOrth=" << nNonOrthoCorrFluid[i]
-            << " , tolerance: " << ePotentialNonCoupledToleranceFluid[i] << nl;
-    }
+    Info<< "   - (Gas region) " << gasRegionName
+        << " : nNonOrth=" << nNonOrthoCorr
+        << " , tolerance: " << ePotentialNonCoupledTolerance << nl;
+        
     forAll(dielectricRegions, i)
     {
         Info<< "   - (Dielectric region) " << dielectricRegions[i].name()
-            << " : nNonOrth=" << nNonOrthoCorrDielectric[i]
+            << " : nNonOrth=" << nNonOrthoCorrDielectricList[i]
             << " , tolerance: "
-            << ePotentialNonCoupledToleranceDielectric[i] << nl;
+            << ePotentialNonCoupledToleranceDielectricList[i] << nl;
     }
     Info<< endl;
 }

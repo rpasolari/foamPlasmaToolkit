@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #---------------------------------------------
-#  Allwmake script for foamPlasmaMultiRun suite
+#  Allwmake script for foamPlasmaToolkit suite
 #  Builds all libraries and the solver
 #---------------------------------------------
 
@@ -19,7 +19,9 @@ echo "Building Libraries..."
 echo "-------------------------------------"
 echo ""
 
+wmake libso src/constants
 ./src/bcs/Allwmake
+./src/models/Allwmake
 
 # Executables
 echo ""

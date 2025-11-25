@@ -14,12 +14,13 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-volScalarField& ePotential = ePotentialDielectric[i];
-surfaceScalarField* surfCharge = surfChargeDielectric.set(i)
-                                ? &surfChargeDielectric[i]
-                                : nullptr;
+volScalarField& ePotentialDielectric = ePotentialDielectricList[i];
+volVectorField& EDielectric = EDielectricList[i];
+surfaceScalarField* surfChargeDielectric = surfChargeDielectricList.set(i)
+                                            ? &surfChargeDielectricList[i]
+                                            : nullptr;
 
-dimensionedScalar& epsilon = epsilonDielectric[i];
+dimensionedScalar& epsilonDielectric = epsilonDielectricList[i];
 
 
 

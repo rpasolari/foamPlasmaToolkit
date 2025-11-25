@@ -1,6 +1,7 @@
 #!/bin/bash
+
 #---------------------------------------------
-#  Allwmake script for foamPlasmaMultiRun suite
+#  Allwmake script for foamPlasmaToolkit suite
 #  Builds all bcs in src/bcs
 #---------------------------------------------
 
@@ -12,7 +13,7 @@ cd "${0%/*}" || exit 1
 echo ">>> Building bcs in src/bcs"
 echo "----------------------------------------------"
 
-wmake coupledElectricPotential/
+wmake libso coupledElectricPotential/ 
 
 echo "----------------------------------------------"
 echo ">>> Done building bcs."

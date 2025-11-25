@@ -1,0 +1,1 @@
+E = -fvc::grad(ePotential);

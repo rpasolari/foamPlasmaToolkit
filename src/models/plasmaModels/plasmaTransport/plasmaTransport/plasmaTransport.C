@@ -49,7 +49,7 @@ void plasmaTransport::constructModels()
         transportModels_.set
         (
             i,
-            plasmaTransportModel::New(modelName, sDict, mesh_, species_)
+            plasmaTransportModel::New(modelName, sDict, mesh_, species_, i)
         );
 
         Info<< "plasmaTransport: Created transport model '" << modelName

@@ -1,5 +1,13 @@
 plasmaTransport/plasmaTransport.C
+
 plasmaTransportModels/plasmaTransportModel.C
 plasmaTransportModels/noneTransportModel/noneTransportModel.C
+plasmaTransportModels/driftDiffusion/driftDiffusion.C
+
+plasmaMobilityModels/plasmaMobilityModel.C
+plasmaMobilityModels/constantMobility/constantMobility.C
+
+plasmaDiffusivityModels/plasmaDiffusivityModel.C
+plasmaDiffusivityModels/constantDiffusivity/constantDiffusivity.C
 
 LIB = $(FOAM_USER_LIBBIN)/libplasmaTransport

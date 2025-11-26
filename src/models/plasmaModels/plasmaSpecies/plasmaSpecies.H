@@ -97,6 +97,9 @@ protected:
         //- Number density fiels n_i [1/m3] for each species
         PtrList<volScalarField> numberDensity_;
 
+        //- Flux fields Gamma for each species
+        PtrList<volVectorField> flux_;
+
         //- Per-species property dictionaries
         HashTable<dictionary> speciesDicts_;
 
@@ -121,27 +124,28 @@ public:
 
     // Access
 
+        //- Mesh and species metadata access
         inline const fvMesh& mesh() const;
         inline const wordList& speciesNames() const;
         inline label nSpecies() const;
         inline const List<scalar>& speciesCharge() const;
 
-        // Number density access (single species)
+        //- Number density access (single specie and whole list)
         inline const volScalarField& numberDensity(label i) const;
         inline volScalarField& numberDensity(label i);
-
-        // Number density access (whole list)
         inline const PtrList<volScalarField>& numberDensity() const;
         inline PtrList<volScalarField>& numberDensity();
 
-        //- Access per-species dictionary (index)
+        //- Flux access
+        inline const volVectorField& flux(label i) const;
+        inline volVectorField& flux(label i);
+        inline const PtrList<volVectorField>& flux() const;
+        inline PtrList<volVectorField>& flux();
+
+        //- Species dictionaries access
         inline const dictionary& speciesDict(label i) const;
-
-        //- Access per-species dictionary (name)
-        inline const dictionary& speciesDict(const word& name) const;
-
-        //- Access default dictionary
-        inline const dictionary& defaultDict() const { return defaultDict_; }
+        inline const dictionary& speciesDict(const word& name) const; 
+        inline const dictionary& defaultDict() const; 
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

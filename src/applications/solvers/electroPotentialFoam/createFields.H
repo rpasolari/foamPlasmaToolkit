@@ -44,13 +44,13 @@ volScalarField eCharge
     mesh
 );
 
-// Read material properties
+// Read material electric properties
 Info << "   Reading material's permittivity\n" << endl;
-IOdictionary propertiesDict
+IOdictionary electricPropertiesDict
 (
     IOobject
     (
-        "properties",
+        "electricProperties",
         runTime.constant(),
         mesh,
         IOobject::MUST_READ,
@@ -60,7 +60,7 @@ IOdictionary propertiesDict
 
 // Relative permittivity
 scalar epsilonR =
-    propertiesDict.lookupOrDefault<scalar>("dielectricConstant", 1.0);
+    electricPropertiesDict.lookupOrDefault<scalar>("dielectricConstant", 1.0);
 
 Info<< "   Material relative permittivity: " << epsilonR << nl;
 

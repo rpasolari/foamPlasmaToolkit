@@ -25,16 +25,18 @@ Class
     Foam::driftDiffusion
     
 Description
-    Drift–diffusion plasma transport model.
+    Drift–diffusion transport model for plasma species.
 
-    This class implements a drift–diffusion–based transport formulation
-    for plasma species. It is selected at runtime using the standard
-    runtime-selection mechanism and operates directly on the species data
-    provided by plasmaSpecies.
+    This model implements the standard drift–diffusion formulation, combining
+    mobility-driven drift in the electric field with concentration-driven
+    diffusion. It updates the species fluxes and densities according to the
+    provided mobility and diffusion coefficients.
 
-    The model participates in advancing the species densities by computing
-    transport fluxes based on drift and diffusion processes, using the
-    general interface defined in plasmaTransportModel.
+    The model is activated by specifying:
+
+        transportModel driftDiffusion;
+
+    in the corresponding species dictionary.
 
 SourceFiles
     driftDiffusion.C
@@ -43,6 +45,10 @@ SourceFiles
 
 #ifndef Foam_driftDiffusion_H
 #define Foam_driftDiffusion_H
+
+#include "plasmaTransportModel.H"
+#include "plasmaMobilityModel.H"
+#include "plasmaDiffusivityModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,14 +60,45 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class driftDiffusion
+:
+    public plasmaTransportModel
 {
-protected:
+private:
 
+    //- Mobility field μ_i(x)
+    volScalarField mobility_;
 
+    //- Diffusivity field D_i(x)
+    volScalarField diffusivity_;
+
+    //- Mobility/Diffusivity submodels
+    autoPtr<plasmaMobilityModel> mobilityModel_;
+    autoPtr<plasmaDiffusivityModel> diffusivityModel_;
+
+    //- Construct mobility and diffusivity models
+    void constructModels();
 
 public:
 
+    //- Runtime type information
+    TypeName("driftDiffusion");
 
+    // Constructors
+
+        //- Construct from components
+        driftDiffusion
+        (
+            const word& modelName,
+            const dictionary& dict,
+            const fvMesh& mesh,
+            const plasmaSpecies& species,
+            const label specieIndex
+        );
+
+    // Member Functions
+        
+        //- Correct model
+        virtual void correct() override;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

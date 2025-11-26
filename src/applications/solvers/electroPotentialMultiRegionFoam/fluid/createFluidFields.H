@@ -15,7 +15,7 @@
 PtrList<volScalarField> ePotentialFluid(fluidRegions.size());
 PtrList<volScalarField> eChargeFluid(fluidRegions.size());
 PtrList<surfaceScalarField> surfChargeFluid(fluidRegions.size());
-PtrList<IOdictionary> propertiesDictFluid(fluidRegions.size());
+PtrList<IOdictionary> electricPropertiesDictFluid(fluidRegions.size());
 PtrList<dimensionedScalar> epsilonFluid(fluidRegions.size());
 
 List<scalar> epsilonRFluid(fluidRegions.size());
@@ -100,14 +100,14 @@ forAll(fluidRegions, i)
         }
     }
 
-    propertiesDictFluid.set
+    electricPropertiesDictFluid.set
     (
         i,
         new IOdictionary
         (
             IOobject
             (
-                "properties",
+                "electricProperties",
                 runTime.constant(),
                 fluidRegions[i],
                 IOobject::MUST_READ,
@@ -116,7 +116,7 @@ forAll(fluidRegions, i)
         )
     );
 
-    epsilonRFluid[i] = propertiesDictFluid[i].lookupOrDefault<scalar>
+    epsilonRFluid[i] = electricPropertiesDictFluid[i].lookupOrDefault<scalar>
     (
         "dielectricConstant", 1.0
     );

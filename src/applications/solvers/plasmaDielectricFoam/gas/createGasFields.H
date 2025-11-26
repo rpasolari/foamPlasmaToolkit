@@ -150,4 +150,6 @@ for (label i = 0; i < species.nSpecies(); ++i)
             << " : " << transport.model(i).modelName() << nl;
 }
 
+transport.correct();
+
 Info << "\nSetup complete. Exiting..." << endl;

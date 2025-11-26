@@ -22,35 +22,27 @@ License
     with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::plasmaTransportModel
+    Foam::plasmaDiffusivityModel
 
 Description
-    Abstract base class for per-species plasma transport behaviour.
+    Abstract base class for plasma species diffusivity modelling.
 
-    This class defines the minimal interface required for describing how a
-    single plasma species is transported within the simulation.  It provides
-    access to:
-        - the global plasmaSpecies database,
-        - the computational mesh,
-        - and the species index associated with this model.
+    This class defines the common interface for all diffusivity models used
+    by plasma transport implementations such as drift–diffusion.
 
-    The plasmaTransportModel does not implement any transport physics itself.
-    Instead, it serves as a common framework from which concrete transport
-    models are derived.  Each derived class implements its own formulation
-    for updating the transport state of a species during the solution loop.
-
-    The run-time selection mechanism is used to construct the appropriate
-    model for each species based on the 'transportModel' entry within the
-    species dictionary.
+    Derived models provide the actual evaluation of the diffusivity D, which
+    may be constant, based on lookupTables, etc. Models are selected at runtime
+    via the standard OpenFOAM run-time selection mechanism using the 
+    'diffusivityModel' entry in the species dictionary.
 
 SourceFiles
-    plasmaTransportModelI.H
-    plasmaTransportModel.C
-    
+    plasmaDiffusivityModelI.H
+    plasmaDiffusivityModel.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef Foam_plasmaTransportModel_H
-#define Foam_plasmaTransportModel_H
+#ifndef Foam_plasmaDiffusivityModel_H
+#define Foam_plasmaDiffusivityModel_H
 
 #include "fvMesh.H"
 #include "autoPtr.H"
@@ -66,14 +58,14 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class plasmaTransportModel Declaration
+                    Class plasmaDiffusivityModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class plasmaTransportModel
+class plasmaDiffusivityModel
 {
 protected:
 
-    //- Model name (e.g. driftDiffusion, fullMomentum)
+    //- Model name (e.g. "constant", "lookupTable", etc.)
     const word modelName_;
 
     //- Mesh reference
@@ -82,37 +74,37 @@ protected:
     //- Reference to species database
     const plasmaSpecies& species_;
 
-    //- Dictionary for this species
-    const dictionary& dict_;
-
     //- Index of the species this model applies to
     const label specieIndex_;
+
+    //- Diffusivity model dictionary
+    const dictionary dict_;
 
 public:
 
     //- Runtime type information
-    TypeName("plasmaTransportModel");
+    TypeName("plasmaDiffusivityModel");
 
     //- Runtime selection table declaration
     declareRunTimeSelectionTable
     (
-        autoPtr,                        // storage class
-        plasmaTransportModel,           // base class
-        dictionary,                     // lookup keyword
-        (                               // constructor signature
+        autoPtr,
+        plasmaDiffusivityModel,
+        dictionary,
+        (
             const word& modelName,
             const dictionary& dict,
             const fvMesh& mesh,
             const plasmaSpecies& species,
             const label specieIndex
         ),
-        (modelName, dict, mesh, species, specieIndex) // macro args
+        (modelName, dict, mesh, species, specieIndex)
     );
 
     // Constructors
 
         //- Construct base model
-        plasmaTransportModel
+        plasmaDiffusivityModel
         (
             const word& modelName,
             const dictionary& dict,
@@ -122,7 +114,7 @@ public:
         );
 
     //- Selector
-    static autoPtr<plasmaTransportModel> New
+    static autoPtr<plasmaDiffusivityModel> New
     (
         const word& modelName,
         const dictionary& dict,
@@ -132,16 +124,12 @@ public:
     );
 
     //- Destructor
-    virtual ~plasmaTransportModel() {}
+    virtual ~plasmaDiffusivityModel() {}
 
     // Member Functions
 
-        //- Correct model (per time step)
-        virtual void correct() = 0;
-
-    // Access
-
-        inline const word& modelName() const;
+        //- Correct diffusivity
+        virtual void correct(volScalarField& D) const = 0;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -150,11 +138,6 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "plasmaTransportModelI.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
 
 // ************************************************************************* //
-

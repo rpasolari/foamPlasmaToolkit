@@ -73,7 +73,8 @@ public:
             const word& modelName,
             const dictionary& dict,
             const fvMesh& mesh,
-            const plasmaSpecies& species
+            const plasmaSpecies& species,
+            const label specieIndex
         );
 
     // Member Functions

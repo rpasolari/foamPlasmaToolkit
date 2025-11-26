@@ -10,12 +10,12 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      properties;
+    object      electricProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * /
 #include "../configuration/config"
 
-dielectricConstant $epsilon;
+dielectricConstant $epsilonR;
 
 
 // ************************************************************************* //

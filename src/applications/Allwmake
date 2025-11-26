@@ -18,5 +18,8 @@ wmake solvers/electroPotentialFoam
 wmake solvers/electroPotentialMultiRegionFoam
 wmake solvers/plasmaDielectricFoam
 
+# Build utilities
+wmake utilities/foamPlasmaCreateSpeciesFields
+
 echo "----------------------------------------------"
 echo ">>> Done building applications."

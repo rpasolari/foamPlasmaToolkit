@@ -22,7 +22,7 @@ License
     with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::mobilityModel
+    Foam::plasmaMobilityModel
 
 Description
     Abstract base class for plasma species mobility modelling.
@@ -31,24 +31,26 @@ Description
     by plasma transport implementations such as drift–diffusion.
 
     Derived models provide the actual evaluation of the mobility μ, which
-    may be constant, computed from Einstein-type relations, or based on
-    more complex physics. Models are selected at runtime via the standard
-    OpenFOAM run-time selection mechanism using the 'mobilityModel' entry
-    in the species dictionary.
+    may be constant, based on lookupTables, etc. Models are selected at runtime
+    via the standard OpenFOAM run-time selection mechanism using the 
+    'mobilityModel' entry in the species dictionary.
 
 SourceFiles
-    mobilityModel.C
+    plasmaMobilityModelI.H
+    plasmaMobilityModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Foam_mobilityModel_H
-#define Foam_mobilityModel_H
+#ifndef Foam_plasmaMobilityModel_H
+#define Foam_plasmaMobilityModel_H
 
 #include "fvMesh.H"
-#include "dictionary.H"
-#include "volFields.H"
 #include "autoPtr.H"
+#include "dictionary.H"
 #include "runTimeSelectionTables.H"
+#include "addToRunTimeSelectionTable.H"
+
+#include "plasmaSpecies.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,52 +58,78 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class mobilityModel Declaration
+                    Class plasmaMobilityModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class mobilityModel
+class plasmaMobilityModel
 {
 protected:
 
-    const fvMesh& mesh_;
-    dictionary coeffs_;
+    //- Model name (e.g. "constant", "lookupTable", etc.)
+    const word modelName_;
 
-    mobilityModel
-    (
-        const dictionary& coeffs,
-        const fvMesh& mesh
-    )
-    :
-        mesh_(mesh),
-        coeffs_(coeffs)
-    {}
+    //- Mesh reference
+    const fvMesh& mesh_;
+
+    //- Reference to species database
+    const plasmaSpecies& species_;
+
+    //- Index of the species this model applies to
+    const label specieIndex_;
+
+    //- Mobility model dictionary
+    const dictionary dict_;
 
 public:
 
-    TypeName("mobilityModel");
+    //- Runtime type information
+    TypeName("plasmaMobilityModel");
 
+    //- Runtime selection table declaration
     declareRunTimeSelectionTable
     (
         autoPtr,
-        mobilityModel,
+        plasmaMobilityModel,
         dictionary,
-        (const dictionary& coeffs, const fvMesh& mesh),
-        (coeffs, mesh)
+        (
+            const word& modelName,
+            const dictionary& dict,
+            const fvMesh& mesh,
+            const plasmaSpecies& species,
+            const label specieIndex
+        ),
+        (modelName, dict, mesh, species, specieIndex)
     );
 
-    static autoPtr<mobilityModel> New
+    // Constructors
+
+        //- Construct base model
+        plasmaMobilityModel
+        (
+            const word& modelName,
+            const dictionary& dict,
+            const fvMesh& mesh,
+            const plasmaSpecies& species,
+            const label specieIndex
+        );
+
+    //- Selector
+    static autoPtr<plasmaMobilityModel> New
     (
         const word& modelName,
-        const dictionary& coeffs,
-        const fvMesh& mesh
+        const dictionary& dict,
+        const fvMesh& mesh,
+        const plasmaSpecies& species,
+        const label specieIndex
     );
 
-    virtual ~mobilityModel() {}
+    //- Destructor
+    virtual ~plasmaMobilityModel() {}
 
-    virtual tmp<volScalarField> mu() const = 0;
+    // Member Functions
 
-    inline const fvMesh& mesh() const { return mesh_; }
-    inline const dictionary& coeffs() const { return coeffs_; }
+        //- Correct mobility
+        virtual void correct(volScalarField& mu) const = 0;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

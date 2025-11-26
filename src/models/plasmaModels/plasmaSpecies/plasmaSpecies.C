@@ -43,7 +43,8 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
     speciesNames_(),
     nSpecies_(0),
     speciesCharge_(),
-    numberDensity_()
+    numberDensity_(),
+    flux_()
 {
     if (!found("species"))
     {
@@ -59,6 +60,7 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
 
     speciesCharge_.setSize(nSpecies_);
     numberDensity_.setSize(nSpecies_);
+    flux_.setSize(nSpecies_);
 
     // Read species properties dictionary
     if (!found("speciesProperties"))
@@ -114,47 +116,45 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
 
         speciesCharge_[i] = readScalar(mergedDict.lookup("charge"));
 
-        // Create/obtain number density field
-        word fieldName = "n_" + sName;
-
-        if (mesh_.foundObject<volScalarField>(fieldName))
-        {
-            // Field already exists - reuse it
-            numberDensity_.set
+        numberDensity_.set
+        (
+            i,
+            new volScalarField
             (
-                i,
-                const_cast<volScalarField*>
+                IOobject
                 (
-                    &mesh_.lookupObject<volScalarField>(fieldName)
-                )
-            );
-        }
-        else
-        {
-            // Create new number density field with zero initial value
-            numberDensity_.set
-            (
-                i,
-                new volScalarField
-                (
-                    IOobject
-                    (
-                        fieldName,
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::READ_IF_PRESENT,
-                        IOobject::AUTO_WRITE
-                    ),
+                    "n_" + speciesNames_[i],
+                    mesh_.time().timeName(),
                     mesh_,
-                    dimensionedScalar
-                    (
-                        "zero",
-                        dimensionSet(0, -3, 0, 0, 0, 0, 0),
-                        0.0
-                    )
+                    IOobject::MUST_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_
+            )
+        );
+
+        flux_.set
+        (
+            i,
+            new volVectorField
+            (
+                IOobject
+                (
+                    "Gamma_" + speciesNames_[i], 
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_,
+                dimensionedVector
+                (
+                    "zero",
+                    dimensionSet(0, -2, -1, 0, 0, 0, 0),
+                    vector::zero
                 )
-            );
-        }
+            )
+        );
     }
 
 }  

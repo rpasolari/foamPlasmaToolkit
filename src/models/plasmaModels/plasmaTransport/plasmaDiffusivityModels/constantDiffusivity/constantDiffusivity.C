@@ -1,17 +1,17 @@
 /*---------------------------------------------------------------------------*\
-  File: noneTransportModel.C
+  File: constantDiffusivity.C
   Part of: foamPlasmaToolkit
   Developed using the OpenFOAM framework and linked against OpenFOAM libraries.
 
   Description:
-    Implementation of Foam::noneTransportModel.
+    Implementation of Foam::constantDiffusivity.
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "noneTransportModel.H"
+#include "constantDiffusivity.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -20,12 +20,17 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Runtime Type Information * * * * * * * * * * //
 
-defineTypeNameAndDebug(noneTransportModel, 0);
-addToRunTimeSelectionTable(plasmaTransportModel,noneTransportModel,dictionary);
+defineTypeNameAndDebug(constantDiffusivity, 0);
+addToRunTimeSelectionTable
+(
+    plasmaDiffusivityModel,
+    constantDiffusivity,
+    dictionary
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-noneTransportModel::noneTransportModel
+constantDiffusivity::constantDiffusivity
 (
     const word& modelName,
     const dictionary& dict,
@@ -34,14 +39,41 @@ noneTransportModel::noneTransportModel
     const label specieIndex
 )
 :
-    plasmaTransportModel(modelName, dict, mesh, species, specieIndex)
-{}
+    plasmaDiffusivityModel(modelName, dict, mesh, species, specieIndex)
+{
+    if (!dict_.found("D"))
+    {
+        FatalIOErrorInFunction(dict_)
+            << "Diffusivity model '" << modelName
+            << "' requires entry 'D' in mobilityCoeffs dictionary."
+            << exit(FatalIOError);
+    }
+
+    dict_.lookup("D") >> D0_;
+
+    if (D0_ < 0)
+    {
+        FatalIOErrorInFunction(dict)
+        << "Diffusivity 'D' must be non-negative" 
+        << exit(FatalIOError);
+    }
+}
+
 
 // * * * * * * * * * * * * * * Public Member Functions * * * * * * * * * * * //
 
-void noneTransportModel::correct()
+void constantDiffusivity::correct(volScalarField& D) const
 {
-    //Do nothing here
+
+    D = dimensionedScalar
+    (
+        "D",
+        D.dimensions(),
+        D0_
+    );
+
+    // OPTIONAL_CHECK IF NEEDED
+    D.correctBoundaryConditions();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

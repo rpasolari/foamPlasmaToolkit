@@ -16,6 +16,7 @@
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+//- Mesh and species metadata access
 inline const Foam::fvMesh&
 Foam::plasmaSpecies::mesh() const
 {
@@ -28,13 +29,11 @@ Foam::plasmaSpecies::speciesNames() const
     return speciesNames_;
 }
 
-
 inline Foam::label
 Foam::plasmaSpecies::nSpecies() const
 {
     return nSpecies_;
 }
-
 
 inline const Foam::List<Foam::scalar>&
 Foam::plasmaSpecies::speciesCharge() const
@@ -43,12 +42,12 @@ Foam::plasmaSpecies::speciesCharge() const
 }
 
 
+//- Number density access
 inline const Foam::volScalarField&
 Foam::plasmaSpecies::numberDensity(Foam::label i) const
 {
     return numberDensity_[i];
 }
-
 
 inline Foam::volScalarField&
 Foam::plasmaSpecies::numberDensity(Foam::label i)
@@ -68,18 +67,54 @@ Foam::plasmaSpecies::numberDensity()
     return numberDensity_;
 }
 
-inline const Foam::dictionary& 
-Foam::plasmaSpecies::speciesDict(label i) const
+
+//- Flux access
+inline const Foam::volVectorField&
+Foam::plasmaSpecies::flux(Foam::label i) const
+{
+    return flux_[i];
+}
+
+
+inline Foam::volVectorField&
+Foam::plasmaSpecies::flux(Foam::label i)
+{
+    return flux_[i];
+}
+
+
+inline const Foam::PtrList<Foam::volVectorField>&
+Foam::plasmaSpecies::flux() const
+{
+    return flux_;
+}
+
+
+inline Foam::PtrList<Foam::volVectorField>&
+Foam::plasmaSpecies::flux()
+{
+    return flux_;
+}
+
+
+//- Species dictionaries access
+inline const Foam::dictionary&
+Foam::plasmaSpecies::speciesDict(Foam::label i) const
 {
     return speciesDicts_[speciesNames_[i]];
 }
 
-inline const Foam::dictionary& 
-Foam::plasmaSpecies::speciesDict(const word& name) const
+inline const Foam::dictionary&
+Foam::plasmaSpecies::speciesDict(const Foam::word& name) const
 {
     return speciesDicts_[name];
 }
 
+inline const Foam::dictionary&
+Foam::plasmaSpecies::defaultDict() const
+{
+    return defaultDict_;
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

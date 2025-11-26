@@ -18,5 +18,8 @@ wclean solvers/electroPotentialFoam
 wclean solvers/electroPotentialMultiRegionFoam
 wclean solvers/plasmaDielectricFoam
 
+# Utilities
+wclean utilities/foamPlasmaCreateSpeciesFields
+
 echo "----------------------------------------------"
 echo ">>> Done cleaning applications."

@@ -22,32 +22,32 @@ License
     with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::constantMobility
+    Foam::constantDiffusivity
 
 Description
-    Constant mobility model for plasma species.
+    Constant diffusivity model for plasma species.
 
-    This model returns a uniform mobility value μ throughout the domain,
-    specified in the mobilityCoeffs sub-dictionary:
+    This model returns a uniform diffusivity value D throughout the domain,
+    specified in the diffusivityCoeffs sub-dictionary:
 
-        mobilityCoeffs
+        diffusivityCoeffs
         {
-            mu   0.1;
+            D   0.1;
         }
 
     It is selected at runtime via:
 
-        mobilityModel  constant;
+        diffusivityModel  constant;
 
 SourceFiles
-    constantMobility.C
+    constantDiffusivity.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Foam_constantMobility_H
-#define Foam_constantMobility_H
+#ifndef Foam_constantDiffusivity_H
+#define Foam_constantDiffusivity_H
 
-#include "plasmaMobilityModel.H"
+#include "plasmaDiffusivityModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,17 +55,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class constantMobility Declaration
+                    Class constantDiffusivity Declaration
 \*---------------------------------------------------------------------------*/
 
-class constantMobility
+class constantDiffusivity
 :
-    public plasmaMobilityModel
+    public plasmaDiffusivityModel
 {
 private:
 
-    //- Constant mobility value [m2/(V·s)]
-    scalar mu0_;
+    //- Constant diffusivity value [m2/s]
+    scalar D0_;
 
 public:
 
@@ -75,7 +75,7 @@ public:
     // Constructors
 
         //- Construct from components
-        constantMobility
+        constantDiffusivity
         (
             const word& modelName,
             const dictionary& dict,
@@ -87,7 +87,7 @@ public:
     // Member Functions
         
         //- Correct model
-        virtual void correct(volScalarField& mu) const override;
+        virtual void correct(volScalarField& D) const override;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

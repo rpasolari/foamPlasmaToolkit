@@ -47,7 +47,6 @@ forAll(dielectricRegions, i)
             << "ePotential will be solved MONOLITHICALLY." << nl
             << "Assembling ePotential fvMatrixAssembly from region "
             << gasRegionName << nl << endl;
-
         fvMatrixAssemblyPtr.reset
         (
             new fvMatrix<scalar>
@@ -85,3 +84,4 @@ if (!coupled)
     Info<< "Regions are NOT coupled; ePotential will be solved in "
         << "SEGREGATE way" << nl << endl;
 }
+

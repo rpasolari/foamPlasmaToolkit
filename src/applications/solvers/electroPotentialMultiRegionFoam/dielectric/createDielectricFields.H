@@ -13,7 +13,7 @@
 \*---------------------------------------------------------------------------*/
 
 PtrList<volScalarField> ePotentialDielectric(dielectricRegions.size());
-PtrList<IOdictionary> propertiesDictDielectric(dielectricRegions.size());
+PtrList<IOdictionary> electricPropertiesDictDielectric(dielectricRegions.size());
 PtrList<surfaceScalarField> surfChargeDielectric(dielectricRegions.size());
 PtrList<dimensionedScalar> epsilonDielectric(dielectricRegions.size());
 
@@ -81,14 +81,14 @@ forAll(dielectricRegions, i)
         }
     }
 
-    propertiesDictDielectric.set
+    electricPropertiesDictDielectric.set
     (
         i,
         new IOdictionary
         (
             IOobject
             (
-                "properties",
+                "electricProperties",
                 runTime.constant(),
                 dielectricRegions[i],
                 IOobject::MUST_READ,
@@ -97,10 +97,10 @@ forAll(dielectricRegions, i)
         )
     );
 
-    epsilonRDielectric[i] = propertiesDictDielectric[i].lookupOrDefault<scalar>
-    (
-        "dielectricConstant", 1.0
-    );
+    epsilonRDielectric[i] =
+        electricPropertiesDictDielectric[i].lookupOrDefault<scalar>(
+            "dielectricConstant", 1.0
+        );
 
     Info << "   Adding material's permittivity\n" << endl;
     epsilonDielectric.set

@@ -238,7 +238,7 @@ public:
     // Evaluation
 
         //- Compute absolute permittivity ε = ε0 * εr from the
-        //- region's "properties" dictionary
+        //- region's "electricProperties" dictionary
         virtual tmp<scalarField> epsilon(const scalarField& Tp) const;
 
         //- Update the coefficients associated with the patch field

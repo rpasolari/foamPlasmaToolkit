@@ -23,7 +23,7 @@ for domain in $(foamListRegions); do
     mkdir -p system/$domain
     mkdir -p constant/$domain
 
-    cp constant/properties constant/$domain/properties
+    cp constant/electricProperties constant/$domain/electricProperties
 
     # Copy fvSchemes and fvSolution
     cp system/fvSchemes system/$domain/fvSchemes
@@ -35,10 +35,10 @@ for domain in $(foamListRegions); do
     sed -i "s|location *\".*\"|location\t\"system/$domain\"|" system/$domain/fvSchemes
     sed -i "s|location *\".*\"|location\t\"system/$domain\"|" system/$domain/fvSolution
 
-    sed -i 's@#include "../@#include "../../@' constant/$domain/properties
-    sed -i "s|location *\".*\"|location\t\t\"constant/$domain\"|" constant/$domain/properties
+    sed -i 's@#include "../@#include "../../@' constant/$domain/electricProperties
+    sed -i "s|location *\".*\"|location\t\t\"constant/$domain\"|" constant/$domain/electricProperties
 
-    sed -i "s/epsilonR/epsilonR${domain}/g" constant/$domain/properties
+    sed -i "s/epsilonR/epsilonR${domain}/g" constant/$domain/electricProperties
 done
 
 runApplication $decompDict decomposePar

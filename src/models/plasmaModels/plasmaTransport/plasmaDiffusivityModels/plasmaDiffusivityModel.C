@@ -1,17 +1,17 @@
 /*---------------------------------------------------------------------------*\
-  File: plasmaTransportModel.C
+  File: plasmaDiffusivityModel.C
   Part of: foamPlasmaToolkit
   Developed using the OpenFOAM framework and linked against OpenFOAM libraries.
 
   Description:
-    Implementation of Foam::plasmaTransportModel.
+    Implementation of Foam::plasmaDiffusivityModel.
 
   Copyright (C) 2025 Rention Pasolari
   License: GNU General Public License v3 or later
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "plasmaTransportModel.H"
+#include "plasmaDiffusivityModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -20,12 +20,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Runtime Type Information * * * * * * * * * * //
 
-defineTypeNameAndDebug(plasmaTransportModel, 0);
-defineRunTimeSelectionTable(plasmaTransportModel, dictionary);
+defineTypeNameAndDebug(plasmaDiffusivityModel, 0);
+defineRunTimeSelectionTable(plasmaDiffusivityModel, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-plasmaTransportModel::plasmaTransportModel
+plasmaDiffusivityModel::plasmaDiffusivityModel
 (
     const word& modelName,
     const dictionary& dict,
@@ -37,13 +37,13 @@ plasmaTransportModel::plasmaTransportModel
     modelName_(modelName),
     mesh_(mesh),
     species_(species),
-    dict_(dict),
-    specieIndex_(specieIndex)
+    specieIndex_(specieIndex),
+    dict_(dict)
 {}
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
-autoPtr<plasmaTransportModel> plasmaTransportModel::New
+autoPtr<plasmaDiffusivityModel> plasmaDiffusivityModel::New
 (
     const word& modelName,
     const dictionary& dict,
@@ -58,14 +58,14 @@ autoPtr<plasmaTransportModel> plasmaTransportModel::New
     if (!ctorPtr)
     {
         FatalIOErrorInFunction(dict)
-            << "Unknown plasmaTransportModel type '" << modelName << "'\n"
+            << "Unknown plasmaDiffusivityModel type '" << modelName << "'\n"
             << "Valid models are: "
             << dictionaryConstructorTablePtr_->sortedToc() << nl
             << exit(FatalIOError);
     }
 
     // Construct and return the model
-    return autoPtr<plasmaTransportModel>
+    return autoPtr<plasmaDiffusivityModel>
     (
         ctorPtr(modelName, dict, mesh, species, specieIndex)
     );

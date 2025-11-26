@@ -316,10 +316,11 @@ coupledElectricPotentialFvPatchScalarField::epsilon
     const scalarField& phiP
 ) const
 {
-    const IOdictionary& propertiesDict =
-        this->db().lookupObject<IOdictionary>("properties");
+    const IOdictionary& electricPropertiesDict =
+        this->db().lookupObject<IOdictionary>("electricProperties");
     
-    scalar epsilonR = propertiesDict.lookupOrDefault("dielectricConstant", 1.0);
+    scalar epsilonR =
+        electricPropertiesDict.lookupOrDefault("dielectricConstant", 1.0);
 
     scalar epsilon0 = constant::plasma::epsilon0.value();
     

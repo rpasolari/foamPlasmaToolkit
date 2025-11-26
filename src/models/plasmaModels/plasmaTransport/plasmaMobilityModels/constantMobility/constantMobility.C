@@ -1,54 +1,78 @@
 /*---------------------------------------------------------------------------*\
   File: constantMobility.C
   Part of: foamPlasmaToolkit
+  Developed using the OpenFOAM framework and linked against OpenFOAM libraries.
+
+  Description:
+    Implementation of Foam::constantMobility.
+
+  Copyright (C) 2025 Rention Pasolari
+  License: GNU General Public License v3 or later
+      See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
 #include "constantMobility.H"
-#include "volFields.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * Runtime Type Information * * * * * * * * * //
+// * * * * * * * * * * * * * * Runtime Type Information * * * * * * * * * * //
 
 defineTypeNameAndDebug(constantMobility, 0);
-addToRunTimeSelectionTable(mobilityModel, constantMobility, dictionary);
+addToRunTimeSelectionTable(plasmaMobilityModel, constantMobility, dictionary);
 
-
-// * * * * * * * * * * Constructors * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 constantMobility::constantMobility
 (
-    const dictionary& coeffs,
-    const fvMesh& mesh
+    const word& modelName,
+    const dictionary& dict,
+    const fvMesh& mesh,
+    const plasmaSpecies& species,
+    const label specieIndex
 )
 :
-    mobilityModel(coeffs, mesh),
-    mu_(coeffs.lookupOrDefault<scalar>("mu", 0.0))
-{}
-
-
-// * * * * * * * * * * Member Functions * * * * * * * * * * //
-
-tmp<volScalarField> constantMobility::mu() const
+    plasmaMobilityModel(modelName, dict, mesh, species, specieIndex)
 {
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "mu",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh_,
-            dimensionedScalar("mu", dimless/dimTime, mu_)
-        )
-    );
+    if (!dict_.found("mu"))
+    {
+        FatalIOErrorInFunction(dict_)
+            << "Mobility model '" << modelName
+            << "' requires entry 'mu' in mobilityCoeffs dictionary."
+            << exit(FatalIOError);
+    }
+
+    dict_.lookup("mu") >> mu0_;
+
+    if (mu0_ < 0)
+    {
+        FatalIOErrorInFunction(dict)
+        << "Mobility 'mu' must be non-negative" 
+        << exit(FatalIOError);
+    }
 }
 
+
+// * * * * * * * * * * * * * * Public Member Functions * * * * * * * * * * * //
+
+void constantMobility::correct(volScalarField& mu) const
+{
+
+    mu = dimensionedScalar
+    (
+        "mu",
+        mu.dimensions(),
+        mu0_
+    );
+
+    // OPTIONAL_CHECK IF NEEDED
+    mu.correctBoundaryConditions();
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // End namespace Foam
+
 // ************************************************************************* //

@@ -114,7 +114,7 @@ forAll(dielectricRegions, i)
         (
             IOobject
             (
-                "properties",
+                "electricProperties",
                 runTime.constant(),
                 dielectricRegions[i],
                 IOobject::MUST_READ,

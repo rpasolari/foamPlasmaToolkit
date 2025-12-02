@@ -38,7 +38,6 @@ Author
     Contact: r.pasolari@gmail.com
 \*---------------------------------------------------------------------------*/
 
-#include "foamPlasmaToolkitConstants.H"
 #include "fvCFD.H"
 #include "regionProperties.H"
 #include "fvOptions.H"
@@ -48,8 +47,10 @@ Author
 #include "fvSolution.H"
 #include "solutionControl.H"
 
+#include "foamPlasmaToolkitConstants.H"
 #include "plasmaSpecies.H"
 #include "plasmaTransport.H"
+#include "plasmaTimeControl.H"
 
 int main(int argc, char *argv[])
 {
@@ -69,6 +70,9 @@ int main(int argc, char *argv[])
     #include "createMeshes.H"
     #include "createFields.H"
 
+    plasmaTimeControl timeControl(runTime, gasMesh());
+    timeControl.setInitialDeltaT(transport);
+
     #include "createCoupledRegions.H"
 
     #include "readElectricPotentialControls.H"
@@ -80,9 +84,11 @@ int main(int argc, char *argv[])
         ++runTime;
 
         Info << "Time = " << runTime.timeName() << nl << endl;
+
+        timeControl.adjustDeltaT(transport);
         
         // Update charge density (ρ = Z * e *n)
-        // #include "updateChargeDensity.H"
+        #include "updateChargeDensity.H"
 
         // Solve the Poisson/Laplace Equation (electric potential)
         if(coupled)
@@ -94,8 +100,9 @@ int main(int argc, char *argv[])
             #include "solveElectricPotentialNonCoupled.H"
         }
 
-        // #include "calculateElectricField.H"
+        #include "calculateElectricField.H"
 
+        transport.correct();
 
         runTime.write();
         runTime.printExecutionTime(Info);

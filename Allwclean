@@ -19,9 +19,10 @@ echo "Cleaning Libraries..."
 echo "-------------------------------------"
 echo ""
 
-./src/bcs/Allwclean
 wclean src/constants
+./src/bcs/Allwclean
 ./src/models/Allwclean
+wclean src/numerics
 
 # Executables
 echo ""

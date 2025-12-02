@@ -22,6 +22,7 @@ echo ""
 wmake libso src/constants
 ./src/bcs/Allwmake
 ./src/models/Allwmake
+wmake libso src/numerics
 
 # Executables
 echo ""

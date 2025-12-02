@@ -82,6 +82,9 @@ protected:
     //- Reference to species database
     const plasmaSpecies& species_;
 
+    //- Reference to the electric field
+    const volVectorField& E_;
+
     //- Dictionary for this species
     const dictionary& dict_;
 
@@ -104,9 +107,10 @@ public:
             const dictionary& dict,
             const fvMesh& mesh,
             const plasmaSpecies& species,
-            const label specieIndex
+            const label specieIndex,
+            const volVectorField& E
         ),
-        (modelName, dict, mesh, species, specieIndex) // macro args
+        (modelName, dict, mesh, species, specieIndex, E) // macro args
     );
 
     // Constructors
@@ -118,7 +122,8 @@ public:
             const dictionary& dict,
             const fvMesh& mesh,
             const plasmaSpecies& species,
-            const label specieIndex
+            const label specieIndex,
+            const volVectorField& E
         );
 
     //- Selector
@@ -128,7 +133,8 @@ public:
         const dictionary& dict,
         const fvMesh& mesh,
         const plasmaSpecies& species,
-        const label specieIndex
+        const label specieIndex,
+        const volVectorField& E
     );
 
     //- Destructor
@@ -136,8 +142,21 @@ public:
 
     // Member Functions
 
-        //- Correct model (per time step)
+        //- Correct model / Update drift velocity (and diffusivity if present)
         virtual void correct() = 0;
+
+        //- Getter for drift velocity
+        virtual const volVectorField& driftVelocity() const = 0;
+
+        //- Getter for the diffusivity
+        virtual const volScalarField* diffusivity() const { return nullptr; }
+
+        //- Getter for electric conduction coefficient
+        virtual tmp<volScalarField> elecConductionCoeff() const = 0;
+
+        //- Getter for electric diffusion charge
+        virtual tmp<volScalarField> elecDiffusionCharge() const = 0;
+
 
     // Access
 

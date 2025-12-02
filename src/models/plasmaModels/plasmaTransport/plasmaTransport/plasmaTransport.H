@@ -49,8 +49,10 @@ SourceFiles
 #ifndef Foam_plasmaTransport_H
 #define Foam_plasmaTransport_H
 
+#include "fvCFD.H"
 #include "fvMesh.H"
 #include "PtrList.H"
+
 
 #include "plasmaSpecies.H"
 #include "plasmaTransportModel.H"
@@ -72,7 +74,16 @@ private:
     const fvMesh& mesh_;
 
     //- Reference to species database
-    const plasmaSpecies& species_;
+    plasmaSpecies& species_;
+
+    //- Reference to the electric field
+    const volVectorField& E_;
+
+    //- Flux fields Gamma for each species
+    PtrList<volVectorField> flux_;
+
+    //- Surface advection flux for each species
+    PtrList<surfaceScalarField> surfaceFlux_;
 
     //- Per-species transport models
     PtrList<plasmaTransportModel> transportModels_;
@@ -94,8 +105,9 @@ public:
         //- Construct from plasmaSpecies and mesh
         plasmaTransport
         (
-            const plasmaSpecies& species,
-            const fvMesh& mesh
+            plasmaSpecies& species,
+            const fvMesh& mesh,
+            const volVectorField& E
         );
 
     //- Destructor
@@ -106,13 +118,30 @@ public:
         //- Correct all models
         void correct();
 
+        tmp<volScalarField> elecConductionCoeff() const;
+        tmp<volScalarField> elecDiffusionCharge() const;
+
     // Access
 
+        //- Mesh and species metadata access
         inline const fvMesh& mesh() const;
         inline const plasmaSpecies& species() const;
 
+        //- Model access
         inline plasmaTransportModel& model(const label i);
         inline const plasmaTransportModel& model(const label i) const;
+
+        //- Flux access
+        inline const volVectorField& flux(label i) const;
+        inline volVectorField& flux(label i);
+        inline const PtrList<volVectorField>& flux() const;
+        inline PtrList<volVectorField>& flux();
+
+        //- Surface Flux access
+        inline const surfaceScalarField& surfaceFlux(label i) const;
+        inline surfaceScalarField& surfaceFlux(label i);
+        inline const PtrList<surfaceScalarField>& surfaceFlux() const;
+        inline PtrList<surfaceScalarField>& surfaceFlux();
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

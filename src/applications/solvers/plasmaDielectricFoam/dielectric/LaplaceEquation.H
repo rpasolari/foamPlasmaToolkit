@@ -19,7 +19,7 @@
 
 if (!coupled)
 {
-    Info<< "\nSolving for ePotential in region " 
+    Info<< "Solving for ePotential in region " 
         << dielectricRegions[i].name() << endl;
 
     for (int nonOrth = 0; nonOrth <= nNonOrthoCorrDielectricList[i]; ++nonOrth)

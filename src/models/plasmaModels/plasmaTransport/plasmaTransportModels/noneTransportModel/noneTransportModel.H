@@ -60,6 +60,11 @@ class noneTransportModel
 :
     public plasmaTransportModel
 {
+private:
+
+    //- Drift velocity
+    volVectorField driftVelocity_;
+
 public:
 
     //- Runtime type information
@@ -74,13 +79,17 @@ public:
             const dictionary& dict,
             const fvMesh& mesh,
             const plasmaSpecies& species,
-            const label specieIndex
+            const label specieIndex,
+            const volVectorField& E
         );
 
     // Member Functions
         
         //- Correct model
         virtual void correct() override;
+
+        //- Return drift velocity
+        virtual const volVectorField& driftVelocity() const override;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -35,8 +35,7 @@ for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 
     if (nonOrth == 0)
     {
-        Info<< "Solving for ePotential in coupled regions (monolithic)"
-            << nl << endl;
+        Info<< "Solving for ePotential in coupled regions (monolithic)" << endl;
     }
 
     fvMatrixAssemblyPtr->solve();
@@ -49,7 +48,6 @@ for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
     fvMatrixAssemblyPtr->clear();
 }
 
-Info<< "\n>>> Solved for ePotential in coupled regions" << endl;
 
 
 

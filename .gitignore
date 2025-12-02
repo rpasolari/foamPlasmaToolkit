@@ -14,3 +14,6 @@ variables
 
 # Ignore TODO file
 /TODO.md
+
+# Ignore vscode files
+.vscode

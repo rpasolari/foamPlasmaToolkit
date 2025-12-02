@@ -11,6 +11,8 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
+#include "fvc.H"
+
 #include "driftDiffusion.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -108,10 +110,27 @@ driftDiffusion::driftDiffusion
     const dictionary& dict,
     const fvMesh& mesh,
     const plasmaSpecies& species,
-    const label specieIndex
+    const label specieIndex,
+    const volVectorField& E
 )
 :
-    plasmaTransportModel(modelName, dict, mesh, species, specieIndex),
+    plasmaTransportModel(modelName, dict, mesh, species, specieIndex, E),
+    driftVelocity_(
+        IOobject(
+            "driftVelocity" + species.speciesNames()[specieIndex],
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector
+        (
+            "driftVelocity",
+            dimensionSet(0, 1, -1, 0, 0, 0, 0),
+            vector::zero
+        )
+    ),
 
     mobility_
     (
@@ -148,14 +167,37 @@ driftDiffusion::driftDiffusion
 
 void driftDiffusion::correct()
 {
-
     mobilityModel_->correct(mobility_);
     diffusivityModel_->correct(diffusivity_);
 
-    Info<< "driftDiffusion::correct() called" << nl;
-    Info<< "  modelName: " << modelName_ << nl;
-    Info<< "  dictionary entries:" << nl;
-    Info<< dict_ << nl;
+    scalar qSign = (species_.speciesChargeNumber(specieIndex_) > 0)? 1.0 : -1.0;
+
+    driftVelocity_ = qSign * mobility_ * E_;
+}
+
+const volVectorField& driftDiffusion::driftVelocity() const
+{
+    return driftVelocity_;
+}
+
+const volScalarField* driftDiffusion::diffusivity() const
+{
+    return &diffusivity_;
+}
+
+tmp<volScalarField> driftDiffusion::elecConductionCoeff() const
+{
+    return 
+        mag(species_.speciesCharge(specieIndex_))
+      * mobility_
+      * species_.numberDensity(specieIndex_);
+
+}
+
+tmp<volScalarField> driftDiffusion::elecDiffusionCharge() const
+{
+    return species_.speciesCharge(specieIndex_)
+           * fvc::laplacian(diffusivity_, species_.numberDensity(specieIndex_));
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

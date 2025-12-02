@@ -59,6 +59,8 @@ SourceFiles
 #include "volFields.H"
 #include "HashTable.H"
 
+#include "foamPlasmaToolkitConstants.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -88,17 +90,20 @@ protected:
         //- Species names
         wordList speciesNames_;
 
+        //- Species index-name mapping
+        HashTable<label> speciesID_;
+
         //- Number of species
         label nSpecies_;
 
         //- Charge number Z_i per species (dimensionless:: -1, +1, +2, etc)
-        List<scalar> speciesCharge_;
+        List<scalar> speciesChargeNumber_;
+
+        //- Charge per species
+        PtrList<dimensionedScalar> speciesCharge_;
 
         //- Number density fiels n_i [1/m3] for each species
         PtrList<volScalarField> numberDensity_;
-
-        //- Flux fields Gamma for each species
-        PtrList<volVectorField> flux_;
 
         //- Per-species property dictionaries
         HashTable<dictionary> speciesDicts_;
@@ -124,23 +129,22 @@ public:
 
     // Access
 
-        //- Mesh and species metadata access
+        
         inline const fvMesh& mesh() const;
         inline const wordList& speciesNames() const;
         inline label nSpecies() const;
-        inline const List<scalar>& speciesCharge() const;
+        inline const List<scalar>& speciesChargeNumber() const;
+        inline scalar speciesChargeNumber(label i) const;
+        inline const PtrList<dimensionedScalar>& speciesCharge() const;
+        inline const dimensionedScalar& speciesCharge(label i) const;
+        //- Get species index from name
+        inline label speciesID(const word& name) const;
 
         //- Number density access (single specie and whole list)
         inline const volScalarField& numberDensity(label i) const;
         inline volScalarField& numberDensity(label i);
         inline const PtrList<volScalarField>& numberDensity() const;
         inline PtrList<volScalarField>& numberDensity();
-
-        //- Flux access
-        inline const volVectorField& flux(label i) const;
-        inline volVectorField& flux(label i);
-        inline const PtrList<volVectorField>& flux() const;
-        inline PtrList<volVectorField>& flux();
 
         //- Species dictionaries access
         inline const dictionary& speciesDict(label i) const;

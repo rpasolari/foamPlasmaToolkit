@@ -122,8 +122,23 @@ volScalarField chargeDensity
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    gasMesh()
+    gasMesh(),
+    dimensionedScalar("zero", dimensionSet(0, -3, 1, 0, 0, 1, 0), 0.0)
 );
+
+Info << "   Reading plasmaSimulationControls\n" << endl;
+IOdictionary plasmaSimulationControlsDict(
+    IOobject(
+        "plasmaSimulationControls",
+        runTime.system(),
+        runTime,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+const dictionary& solverDict = plasmaSimulationControlsDict.subDict("solver");
+word poissonSolver(solverDict.lookup("poissonSolver"));
 
 Info<< "Constructing plasma species\n" << endl;
 
@@ -134,13 +149,13 @@ Info << "Number of species: " << species.nSpecies() << nl << endl;
 for (label i = 0; i < species.nSpecies(); ++i)
 {
     Info << "  Species " << i << ": "
-            << species.speciesNames()[i]
-            << ", charge = " << species.speciesCharge()[i] << nl;
+         << species.speciesNames()[i]
+         << ", charge = " << species.speciesChargeNumber(i) << nl;
 }
 
 Info << "\n--- Constructing plasmaTransport ---" << nl << endl;
 
-plasmaTransport transport(species, gasMesh());
+plasmaTransport transport(species, gasMesh(), E);
 
 Info << "Transport models constructed." << nl << endl;
 
@@ -150,6 +165,6 @@ for (label i = 0; i < species.nSpecies(); ++i)
             << " : " << transport.model(i).modelName() << nl;
 }
 
-transport.correct();
+// transport.correct();
 
 Info << "\nSetup complete. Exiting..." << endl;

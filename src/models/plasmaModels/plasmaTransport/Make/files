@@ -1,7 +1,6 @@
 plasmaTransport/plasmaTransport.C
 
 plasmaTransportModels/plasmaTransportModel.C
-plasmaTransportModels/noneTransportModel/noneTransportModel.C
 plasmaTransportModels/driftDiffusion/driftDiffusion.C
 
 plasmaMobilityModels/plasmaMobilityModel.C

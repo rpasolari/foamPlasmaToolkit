@@ -36,11 +36,34 @@ Foam::plasmaSpecies::nSpecies() const
 }
 
 inline const Foam::List<Foam::scalar>&
+Foam::plasmaSpecies::speciesChargeNumber() const
+{
+    return speciesChargeNumber_;
+}
+
+inline Foam::scalar
+Foam::plasmaSpecies::speciesChargeNumber(Foam::label i) const
+{
+    return speciesChargeNumber_[i];
+}
+
+inline const Foam::PtrList<Foam::dimensionedScalar>&
 Foam::plasmaSpecies::speciesCharge() const
 {
     return speciesCharge_;
 }
 
+inline const Foam::dimensionedScalar&
+Foam::plasmaSpecies::speciesCharge(Foam::label i) const
+{
+    return speciesCharge_[i];
+}
+
+inline Foam::label
+Foam::plasmaSpecies::speciesID(const Foam::word& name) const
+{
+    return speciesID_[name];
+}
 
 //- Number density access
 inline const Foam::volScalarField&
@@ -65,35 +88,6 @@ inline Foam::PtrList<Foam::volScalarField>&
 Foam::plasmaSpecies::numberDensity()
 {
     return numberDensity_;
-}
-
-
-//- Flux access
-inline const Foam::volVectorField&
-Foam::plasmaSpecies::flux(Foam::label i) const
-{
-    return flux_[i];
-}
-
-
-inline Foam::volVectorField&
-Foam::plasmaSpecies::flux(Foam::label i)
-{
-    return flux_[i];
-}
-
-
-inline const Foam::PtrList<Foam::volVectorField>&
-Foam::plasmaSpecies::flux() const
-{
-    return flux_;
-}
-
-
-inline Foam::PtrList<Foam::volVectorField>&
-Foam::plasmaSpecies::flux()
-{
-    return flux_;
 }
 
 

@@ -1,0 +1,195 @@
+/*---------------------------------------------------------------------------*\
+  File: plasmaTimeControl.C
+  Part of: foamPlasmaToolkit
+  Developed using the OpenFOAM framework and linked against OpenFOAM libraries.
+
+  Description:
+    Implementation of Foam::plasmaTimeControl.
+
+  Copyright (C) 2025 Rention Pasolari
+  License: GNU General Public License v3 or later
+      See: <http://www.gnu.org/licenses/>.
+\*---------------------------------------------------------------------------*/
+
+#include "plasmaTimeControl.H"
+#include "plasmaTransport.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+plasmaTimeControl::plasmaTimeControl(Time& runTime, const fvMesh& mesh)
+:
+    runTime_(runTime),
+    mesh_(mesh),
+    dict_(dictionary::null),
+    adjustTimeStep_(false),
+    maxDeltaT_(GREAT),
+    limitDielectricRelaxationRatio_(false),
+    maxDielectricRelaxationRatio_(1.0),
+    limitSpeciesCo_(false),
+    maxSpeciesCo_(1.0),
+    speciesName_("e")
+{
+    read();
+}
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void plasmaTimeControl::read()
+{
+    IOdictionary plasmaDict
+        (
+            IOobject
+            (
+                "plasmaSimulationControls",
+                runTime_.system(),
+                runTime_,
+                IOobject::MUST_READ_IF_MODIFIED,
+                IOobject::NO_WRITE
+            )
+        );
+
+
+    if (plasmaDict.found("plasmaTimeControl"))
+    {
+        dict_ = plasmaDict.subDict("plasmaTimeControl");
+
+        adjustTimeStep_ =
+            dict_.lookupOrDefault<Switch>("adjustTimeStep", false);
+
+        maxDeltaT_ =
+            dict_.lookupOrDefault<scalar>("maxDeltaT", GREAT);
+
+        limitDielectricRelaxationRatio_ =
+         dict_.lookupOrDefault<Switch>("limitDielectricRelaxationRatio", false);
+
+        maxDielectricRelaxationRatio_ =
+            dict_.lookupOrDefault<scalar>("maxDielectricRelaxationRatio", 1.0);
+
+        limitSpeciesCo_ = 
+            dict_.lookupOrDefault<Switch>("limitSpeciesCo", false);
+
+        if (limitSpeciesCo_)
+                {
+                    maxSpeciesCo_ = 
+                        dict_.lookupOrDefault<scalar>("maxSpeciesCo", 1.0);
+
+                    speciesName_ = 
+                        dict_.lookupOrDefault<word>("speciesName", "e");
+                }
+    }
+}
+
+void plasmaTimeControl::adjustDeltaT(const plasmaTransport& transport)
+{
+    if (!adjustTimeStep_ || runTime_.timeIndex() == 1) return;
+
+    scalar newDeltaT = maxDeltaT_;
+    const scalar currentDeltaT = runTime_.deltaTValue();
+    const scalar eps0 = constant::plasma::epsilon0.value();
+
+    scalar maxSigma = 0.0;
+    scalar maxFluxRate = 0.0;
+
+    // Dielectric relaxation (tau = epsilon / sigma)
+    if (limitDielectricRelaxationRatio_)
+    {
+        tmp<volScalarField> tSigma = transport.elecConductionCoeff();
+        const volScalarField& sigma = tSigma();
+
+        maxSigma = gMax(mag(sigma)().primitiveField());
+        scalar dielectricLimit = 
+            (maxDielectricRelaxationRatio_ * eps0) / (maxSigma + VSMALL);
+
+        newDeltaT = min(newDeltaT, dielectricLimit);
+        tSigma.clear();
+    }
+
+    // Species Courant Limit
+    if (limitSpeciesCo_)
+    {
+        label speciesLabel = transport.species().speciesID(speciesName_);
+        const surfaceScalarField& phi = transport.surfaceFlux(speciesLabel);
+
+        scalarField sumPhi
+        (
+            fvc::surfaceSum(mag(phi))().primitiveField()
+        );
+
+        maxFluxRate = 0.5 * gMax(sumPhi / mesh_.V().field());
+
+        scalar courantLimit = maxSpeciesCo_ / (maxFluxRate + SMALL);
+
+        newDeltaT = min(newDeltaT, courantLimit);
+    }
+
+    // Reduction and setting
+    reduce(newDeltaT, minOp<scalar>());
+
+    if (newDeltaT > currentDeltaT)
+    {
+        // Cap growth at 20% (factor 1.2)
+        newDeltaT = min(newDeltaT, currentDeltaT * 1.2);
+    }
+
+    // Set the new time step
+    runTime_.setDeltaT(newDeltaT);
+
+    // Report
+    Info << "deltaT           = " << newDeltaT << endl;
+
+    if (limitDielectricRelaxationRatio_)
+    {
+        scalar projectedRatio = (newDeltaT * maxSigma) / eps0;
+        Info << "deltaT/RelaxTime = " << projectedRatio 
+            << " (Limit: " << maxDielectricRelaxationRatio_ << ")" << endl;
+    }
+
+    if (limitSpeciesCo_)
+    {
+        scalar projectedCo = maxFluxRate * newDeltaT;
+        Info << "Courant (" << speciesName_ << ")" << "      = " << projectedCo
+            << " (Limit: " << maxSpeciesCo_ << ")" << endl;
+    }
+}
+
+void plasmaTimeControl::setInitialDeltaT(const plasmaTransport& transport)
+{
+    if (!adjustTimeStep_) return;
+
+    scalar newDeltaT = maxDeltaT_;
+    const scalar currentDeltaT = runTime_.deltaTValue();
+
+    // Dielectric relaxation (tau = epsilon / sigma)
+    if (limitDielectricRelaxationRatio_)
+    {
+        tmp<volScalarField> tSigma = transport.elecConductionCoeff();
+        const volScalarField& sigma = tSigma();
+
+        const scalar eps0 = constant::plasma::epsilon0.value();
+
+        scalar maxSigma = gMax(mag(sigma)().primitiveField());
+        scalar dielectricLimit = 
+            (maxDielectricRelaxationRatio_ * eps0) / (maxSigma + VSMALL);
+
+        newDeltaT = min(newDeltaT, dielectricLimit);
+        tSigma.clear();
+    }
+
+    // Reduction and setting
+    reduce(newDeltaT, minOp<scalar>());
+    if (newDeltaT < currentDeltaT)
+    {
+        runTime_.setDeltaT(newDeltaT);
+    }    
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

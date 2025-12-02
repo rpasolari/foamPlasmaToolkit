@@ -20,10 +20,74 @@
 
 if (!coupled)
 {
-    Info<< "\nSolving for ePotential in region " 
+    Info<< "Solving for ePotential in region " 
         << gasRegionName << endl;
 
     for (int nonOrth = 0; nonOrth <= nNonOrthoCorr; ++nonOrth)
+    {
+        if (poissonSolver == "explicit")
+        {
+            fvScalarMatrix PoissonEquation
+            (
+                fvm::laplacian(epsilon,ePotential)
+                ==
+                -chargeDensity
+            );
+
+            PoissonEquation.relax();
+
+            fvOptions.constrain(PoissonEquation);
+
+            auto sp = PoissonEquation.solve();
+
+            if (nonOrth == 0)
+            {
+                ePotentialNonCoupledResidual = sp.initialResidual();
+            }
+        }
+        else if (poissonSolver == "semiImplicit")
+        {
+            dimensionedScalar deltaT
+            (
+                "dt",
+                dimensionSet(0,0,1,0,0,0,0),
+                mesh.time().deltaTValue()
+            );
+
+            fvScalarMatrix PoissonEquation(
+                fvm::laplacian(
+                    epsilon + deltaT * transport.elecConductionCoeff(),
+                    ePotential
+                )
+            ==
+                -chargeDensity
+                - deltaT * transport.elecDiffusionCharge()
+            );
+
+            PoissonEquation.relax();
+
+            fvOptions.constrain(PoissonEquation);
+
+            auto sp = PoissonEquation.solve();
+
+            if (nonOrth == 0)
+            {
+               ePotentialNonCoupledResidual = sp.initialResidual();
+            }
+        }
+        else
+        {
+            FatalErrorInFunction
+                << "Unknown Poisson solver: " << poissonSolver
+                << exit(FatalError);
+        }
+    }
+
+    fvOptions.correct(ePotential);
+}
+else
+{
+    if (poissonSolver == "explicit")
     {
         fvScalarMatrix PoissonEquation
         (
@@ -36,23 +100,25 @@ if (!coupled)
 
         fvOptions.constrain(PoissonEquation);
 
-        auto sp = PoissonEquation.solve();
-
-        if (nonOrth == 0)
-        {
-            ePotentialNonCoupledResidual = sp.initialResidual();
-        }
+        fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
     }
-
-    fvOptions.correct(ePotential);
-}
-else
-{
-        fvScalarMatrix PoissonEquation
+    else if (poissonSolver == "semiImplicit")
+    {
+        dimensionedScalar deltaT
         (
-            fvm::laplacian(epsilon,ePotential)
-            ==
+            "dt",
+            dimensionSet(0,0,1,0,0,0,0),
+            mesh.time().deltaTValue()
+        );
+
+        fvScalarMatrix PoissonEquation(
+            fvm::laplacian(
+                epsilon + deltaT * transport.elecConductionCoeff(),
+                ePotential
+            )
+        ==
             -chargeDensity
+            -deltaT * transport.elecDiffusionCharge()
         );
 
         PoissonEquation.relax();
@@ -60,4 +126,12 @@ else
         fvOptions.constrain(PoissonEquation);
 
         fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
+    }
+    else
+    {
+        FatalErrorInFunction
+            << "Unknown Poisson solver: " << poissonSolver
+            << exit(FatalError);
+    }
+
 }

@@ -42,9 +42,9 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
     mesh_(mesh),
     speciesNames_(),
     nSpecies_(0),
+    speciesChargeNumber_(),
     speciesCharge_(),
-    numberDensity_(),
-    flux_()
+    numberDensity_()
 {
     if (!found("species"))
     {
@@ -58,9 +58,15 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
     lookup("species") >> speciesNames_;
     nSpecies_ = speciesNames_.size();
 
+    speciesID_.clear();
+    for (label i = 0; i < nSpecies_; ++i)
+    {
+        speciesID_.insert(speciesNames_[i], i);
+    }
+
+    speciesChargeNumber_.setSize(nSpecies_);
     speciesCharge_.setSize(nSpecies_);
     numberDensity_.setSize(nSpecies_);
-    flux_.setSize(nSpecies_);
 
     // Read species properties dictionary
     if (!found("speciesProperties"))
@@ -114,7 +120,18 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
                 << exit(FatalIOError);
         }
 
-        speciesCharge_[i] = readScalar(mergedDict.lookup("charge"));
+        speciesChargeNumber_[i] = readScalar(mergedDict.lookup("charge"));
+
+        speciesCharge_.set
+        (
+            i,
+            new dimensionedScalar
+            (
+                "q_" + speciesNames_[i],
+                constant::plasma::eCharge.dimensions(),
+                speciesChargeNumber_[i] * constant::plasma::eCharge.value()
+            )
+        );
 
         numberDensity_.set
         (
@@ -132,31 +149,7 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
                 mesh_
             )
         );
-
-        flux_.set
-        (
-            i,
-            new volVectorField
-            (
-                IOobject
-                (
-                    "Gamma_" + speciesNames_[i], 
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                mesh_,
-                dimensionedVector
-                (
-                    "zero",
-                    dimensionSet(0, -2, -1, 0, 0, 0, 0),
-                    vector::zero
-                )
-            )
-        );
     }
-
 }  
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

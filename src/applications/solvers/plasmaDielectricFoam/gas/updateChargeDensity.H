@@ -12,12 +12,9 @@ Description:
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-chargeDensity = dimensionedScalar("zero", chargeDensity.dimensions(),0);
-
-for (label i = 0; i < nSpecies; ++i)
+for (label i = 0; i < species.nSpecies(); ++i)
 {
     chargeDensity += 
-        speciesCharge[i]
-      * constant::plasma::eCharge
-      * numberDensity[i]
+        species.speciesCharge(i)
+      * species.numberDensity(i);
 }

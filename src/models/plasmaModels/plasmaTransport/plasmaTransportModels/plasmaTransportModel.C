@@ -31,14 +31,16 @@ plasmaTransportModel::plasmaTransportModel
     const dictionary& dict,
     const fvMesh& mesh,
     const plasmaSpecies& species,
-    const label specieIndex
+    const label specieIndex,
+    const volVectorField& E
 )
 :
     modelName_(modelName),
     mesh_(mesh),
     species_(species),
     dict_(dict),
-    specieIndex_(specieIndex)
+    specieIndex_(specieIndex),
+    E_(E)
 {}
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
@@ -49,7 +51,8 @@ autoPtr<plasmaTransportModel> plasmaTransportModel::New
     const dictionary& dict,
     const fvMesh& mesh,
     const plasmaSpecies& species,
-    const label specieIndex
+    const label specieIndex,
+    const volVectorField& E
 )
 {
     // Lookup constructor using function-call operator
@@ -67,7 +70,7 @@ autoPtr<plasmaTransportModel> plasmaTransportModel::New
     // Construct and return the model
     return autoPtr<plasmaTransportModel>
     (
-        ctorPtr(modelName, dict, mesh, species, specieIndex)
+        ctorPtr(modelName, dict, mesh, species, specieIndex, E)
     );
 }
 

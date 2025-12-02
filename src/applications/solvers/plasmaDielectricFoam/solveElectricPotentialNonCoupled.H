@@ -18,7 +18,7 @@ Info<< "Solving for ePotential in "
 for(int outer = 1; outer <= ePotentialNonCoupledLoopMaxIter; ++outer)
 {
 
-    Info<< "\n  -ePotential iteration (" << outer << "/" 
+    Info<< "  -ePotential iteration (" << outer << "/" 
         << ePotentialNonCoupledLoopMaxIter << ")" << endl;
 
     // Reset residual lists each iteration

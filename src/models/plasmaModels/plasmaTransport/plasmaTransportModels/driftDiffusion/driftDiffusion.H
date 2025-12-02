@@ -65,6 +65,9 @@ class driftDiffusion
 {
 private:
 
+    //- Drift velocity
+    volVectorField driftVelocity_;
+
     //- Mobility field μ_i(x)
     volScalarField mobility_;
 
@@ -92,13 +95,26 @@ public:
             const dictionary& dict,
             const fvMesh& mesh,
             const plasmaSpecies& species,
-            const label specieIndex
+            const label specieIndex,
+            const volVectorField& E
         );
 
     // Member Functions
         
         //- Correct model
         virtual void correct() override;
+
+        //- Return drift velocity
+        virtual const volVectorField& driftVelocity() const override;
+
+        //- Return diffusivity
+        virtual const volScalarField* diffusivity() const override;
+
+        //- Return electric conduction coefficient
+        virtual tmp<volScalarField> elecConductionCoeff() const override;
+
+        //- Return electric diffusion charge
+        virtual tmp<volScalarField> elecDiffusionCharge() const override;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

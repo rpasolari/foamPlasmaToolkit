@@ -30,7 +30,6 @@ addToRunTimeSelectionTable(plasmaTransportModel, driftDiffusion, dictionary);
 void driftDiffusion::constructModels()
 {
     // Construct mobility model
-
     if (!dict_.found("mobilityModel"))
     {
         FatalIOErrorInFunction(dict_)
@@ -66,7 +65,6 @@ void driftDiffusion::constructModels()
     );
 
     // Construct diffusivity model
-
     if (!dict_.found("diffusivityModel"))
     {
         FatalIOErrorInFunction(dict_)
@@ -191,7 +189,6 @@ tmp<volScalarField> driftDiffusion::elecConductionCoeff() const
         mag(species_.speciesCharge(specieIndex_))
       * mobility_
       * species_.numberDensity(specieIndex_);
-
 }
 
 tmp<volScalarField> driftDiffusion::elecDiffusionCharge() const

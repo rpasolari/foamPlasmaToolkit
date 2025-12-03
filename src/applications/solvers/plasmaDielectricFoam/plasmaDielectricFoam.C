@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
 
     #include "readElectricPotentialControls.H"
 
+    #include "reportSimulationSummary.H"
+
     Info<< "\nStarting iteration loop\n" << endl;
 
     while (runTime.run())
@@ -100,6 +102,7 @@ int main(int argc, char *argv[])
             #include "solveElectricPotentialNonCoupled.H"
         }
 
+        // Update the Electric field
         #include "calculateElectricField.H"
 
         transport.correct();

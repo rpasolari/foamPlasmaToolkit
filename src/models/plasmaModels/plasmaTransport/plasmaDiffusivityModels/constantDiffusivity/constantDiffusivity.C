@@ -39,7 +39,8 @@ constantDiffusivity::constantDiffusivity
     const label specieIndex
 )
 :
-    plasmaDiffusivityModel(modelName, dict, mesh, species, specieIndex)
+    plasmaDiffusivityModel(modelName, dict, mesh, species, specieIndex),
+    D0_(0.0)
 {
     if (!dict_.found("D"))
     {
@@ -71,9 +72,6 @@ void constantDiffusivity::correct(volScalarField& D) const
         D.dimensions(),
         D0_
     );
-
-    // OPTIONAL_CHECK IF NEEDED
-    D.correctBoundaryConditions();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

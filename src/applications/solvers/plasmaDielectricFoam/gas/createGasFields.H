@@ -143,28 +143,8 @@ word poissonSolver(solverDict.lookup("poissonSolver"));
 Info<< "Constructing plasma species\n" << endl;
 
 plasmaSpecies species(gasMesh());
-Info << "Species loaded: " << species.speciesNames() << nl;
-Info << "Number of species: " << species.nSpecies() << nl << endl;
 
-for (label i = 0; i < species.nSpecies(); ++i)
-{
-    Info << "  Species " << i << ": "
-         << species.speciesNames()[i]
-         << ", charge = " << species.speciesChargeNumber(i) << nl;
-}
-
-Info << "\n--- Constructing plasmaTransport ---" << nl << endl;
+Info << "Constructing plasmaTransport\n" << endl;
 
 plasmaTransport transport(species, gasMesh(), E);
 
-Info << "Transport models constructed." << nl << endl;
-
-for (label i = 0; i < species.nSpecies(); ++i)
-{
-    Info << "  Model for " << species.speciesNames()[i]
-            << " : " << transport.model(i).modelName() << nl;
-}
-
-// transport.correct();
-
-Info << "\nSetup complete. Exiting..." << endl;

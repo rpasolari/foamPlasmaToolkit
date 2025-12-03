@@ -34,7 +34,8 @@ constantMobility::constantMobility
     const label specieIndex
 )
 :
-    plasmaMobilityModel(modelName, dict, mesh, species, specieIndex)
+    plasmaMobilityModel(modelName, dict, mesh, species, specieIndex),
+    mu0_(0.0)
 {
     if (!dict_.found("mu"))
     {
@@ -66,9 +67,6 @@ void constantMobility::correct(volScalarField& mu) const
         mu.dimensions(),
         mu0_
     );
-
-    // OPTIONAL_CHECK IF NEEDED
-    mu.correctBoundaryConditions();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

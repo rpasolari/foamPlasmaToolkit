@@ -124,6 +124,44 @@ public:
 
         //- Set the first time step of the simulation
         void setInitialDeltaT(const plasmaTransport& transport);
+
+    // Accessors (Getters)
+
+        //- Is adjustable time stepping enabled?
+        inline bool adjustTimeStep() const
+        {
+            return adjustTimeStep_;
+        }
+
+        //- Is dielectric relaxation limiting enabled?
+        inline bool limitDielectricRelaxationRatio() const
+        {
+            return limitDielectricRelaxationRatio_;
+        }
+
+        //- Get the max allowed dielectric relaxation ratio
+        inline scalar maxDielectricRelaxationRatio() const
+        {
+            return maxDielectricRelaxationRatio_;
+        }
+
+        //- Is species Courant number limiting enabled?
+        inline bool limitSpeciesCo() const
+        {
+            return limitSpeciesCo_;
+        }
+
+        //- Get the max allowed species Courant number
+        inline scalar maxSpeciesCo() const
+        {
+            return maxSpeciesCo_;
+        }
+
+        //- Get the species name used for Courant number limiting
+        inline const word& speciesName() const
+        {
+            return speciesName_;
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

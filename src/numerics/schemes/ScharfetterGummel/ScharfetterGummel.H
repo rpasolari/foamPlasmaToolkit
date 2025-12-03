@@ -38,6 +38,11 @@ Description
     of the species density even in regions of high electric fields (sheaths) 
     where standard central or upwind schemes may fail or produce oscillations
 
+References
+    Scharfetter, D. L., & Gummel, H. K. (1969).
+    "Large-Signal Analysis of a Silicon Read Diode Oscillator."
+    IEEE Transactions on Electron Devices, 16(1), 64–77.
+
 SourceFiles
     
 \*---------------------------------------------------------------------------*/
@@ -92,9 +97,18 @@ namespace fvm
         // Bernoulli Function Definition: B(x) = x / exp(x) - 1
         auto Bern = [](scalar x) -> scalar
         {
-            if (mag(x) < 1e-4) return 1.0 - x/2.0;
-            if (x > 80)        return 0.0;
-            if (x < 80)        return -x;
+            // Limit 1: SIngularity at x = 0
+            if (mag(x) < 1e-4) 
+            {
+                return 1.0 - x/2.0 + sqr(x)/12.0 - pow4(x)/720.0;
+            }
+            // Limit 2: B(200) = 0 effectively
+            if (x > 200)        return 0.0;
+
+            // Limit 3: At x -> -inf, B(x) = -x
+            if (x < -200)       return -x;
+
+            // Standard calculation
             return x / (exp(x) - 1.0); 
         };
 
@@ -109,8 +123,8 @@ namespace fvm
             scalar driftFlux = phiDrift[facei];
             scalar Pe = driftFlux / (diffCond + VSMALL);
 
-            scalar coeffP = diffCond * Bern(Pe);
-            scalar coeffN = diffCond * Bern(-Pe);
+            scalar coeffP = diffCond * Bern(-Pe);
+            scalar coeffN = diffCond * Bern(Pe);
 
             mat.diag()[P] += coeffP;
             mat.diag()[N] += coeffN;
@@ -124,13 +138,53 @@ namespace fvm
         {
             const fvPatchField<Type>& ptf = rho.boundaryField()[patchi];
 
-            if (!ptf.coupled())
+            if (ptf.coupled()) continue;
+
+            scalarField& intCoeffs = mat.internalCoeffs()[patchi];
+            scalarField& bdryCoeffs = mat.boundaryCoeffs()[patchi];
+
+            const auto& magSf = mesh.magSf().boundaryField()[patchi];
+            const auto& delta = mesh.deltaCoeffs().boundaryField()[patchi];
+
+            const auto& DfPatch = Df.boundaryField()[patchi];
+            const auto& phiDriftPatch = phiDrift.boundaryField()[patchi];
+
+            tmp<scalarField> tStdInt = ptf.valueInternalCoeffs(rho);
+            tmp<scalarField> tStdBdry = ptf.valueBoundaryCoeffs(rho);
+
+            const scalarField& stdInt = tStdInt();
+            const scalarField& stdBdry = tStdBdry();
+
+            forAll(ptf, facei)
             {
-                mat.internalCoeffs()[patchi] = ptf.valueInternalCoeffs(rho);
-                mat.boundaryCoeffs()[patchi] = ptf.valueBoundaryCoeffs(rho);
+                // Calculate local properties
+                scalar diffCond = DfPatch[facei] * magSf[facei] * delta[facei];
+                scalar driftFlux = phiDriftPatch[facei];
+                scalar Pe = driftFlux / (diffCond + VSMALL);
+
+                scalar w_P = diffCond * Bern(-Pe);
+                scalar w_b = diffCond * Bern(Pe);
+                // CASE A: BC fixes VALUE (Dirichlet)
+                // e.g., fixedValue, timeVaryingMapped, OhmicContact
+                if (ptf.fixesValue())
+                {
+                    // Diagonal Term (multiplies rho_P)
+                    intCoeffs[facei] = w_P;
+
+                    // Source Term (multiplies rho_b)
+                    bdryCoeffs[facei] = w_b;
+                }
+                // CASE B: BC fixes FLUX or GRADIENT (Neumann/Robin)
+                // e.g., zeroGradient, fixedGradient, mixed
+                else
+                {
+                    scalar netFluxCoeff = w_P - w_b;
+
+                    intCoeffs[facei] = netFluxCoeff;
+                    bdryCoeffs[facei] = 0.0;
+                }
             }
         }
-
         return tmat;
     }
 

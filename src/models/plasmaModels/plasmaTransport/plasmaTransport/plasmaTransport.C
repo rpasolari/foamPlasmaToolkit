@@ -52,9 +52,6 @@ void plasmaTransport::constructModels()
             i,
             plasmaTransportModel::New(modelName, sDict, mesh_, species_, i, E_)
         );
-
-        Info<< "plasmaTransport: Created transport model '" << modelName
-            << "' for species '" << sName << "'\n";
     }
 }
 
@@ -135,6 +132,9 @@ void plasmaTransport::correct()
 
     for (label i = 0; i < nSpecies; ++i)
     {
+        const word& sName = species_.speciesNames()[i];
+        const dictionary& sDict = species_.speciesDict(i);
+
         transportModels_[i].correct();
 
         const volVectorField& U = transportModels_[i].driftVelocity();
@@ -142,24 +142,102 @@ void plasmaTransport::correct()
         surfaceFlux_[i] = fvc::flux(U);
 
         volScalarField& n = species_.numberDensity(i);
+        fvScalarMatrix nEqn(fvm::ddt(n));
 
-        // fvScalarMatrix eqn
-        // (
-        //     fvm::ddt(n) + fvm::div(surfaceFlux_[i], n)
-        // );
-const volScalarField* D = transportModels_[i].diffusivity();
-fvScalarMatrix eqn
-(
-    // You must dereference the pointer D to pass the actual field object
-    fvm::ddt(n) + fvm::ScharfetterGummel(n, surfaceFlux_[i], *D) // FIX HERE
-);
+        word modelName;
+        sDict.lookup("transportModel") >> modelName;
+        word advMode = sDict.lookupOrDefault<word>("advectionMode", "implicit");
+        bool isExplicit = false;
 
-        // if (const volScalarField* D = transportModels_[i].diffusivity())
-        // {
-        //     eqn -= fvm::laplacian(*D, n);
-        // }
+        if (advMode == "explicit")
+        {
+            isExplicit = true;
+        }
+        else if (advMode != "implicit")
+        {
+            FatalIOErrorInFunction(sDict)
+                << "Species '" << sName << "': Invalid advectionMode '" 
+                << advMode << "'. Valid options: 'implicit', 'explicit'."
+                << exit(FatalIOError);
+        }
 
-        eqn.solve();
+        word scheme = sDict.lookupOrDefault<word>
+        (
+            "driftDiffusionFluxScheme", 
+            "standard"
+        );
+
+        if (modelName == "driftDiffusion")
+        {
+            const volScalarField* D = transportModels_[i].diffusivity();
+            if (!D)
+            {
+                FatalErrorInFunction
+                    << "DriftDiffusion model has null Diffusivity."
+                    << exit(FatalError);
+            }
+
+            if (scheme == "ScharfetterGummel")
+            {
+                // SG Scheme: Forces Implicit
+                if (isExplicit)
+                {
+                    WarningInFunction
+                        << "Species '" << sName 
+                        << "': advectionMode 'explicit' is ignored because "
+                        << "Scharfetter-Gummel requires implicit coupling."
+                        << endl;
+                }
+                
+                nEqn += fvm::ScharfetterGummel(n, surfaceFlux_[i], *D);
+            }
+            else if (scheme == "standard")
+            {
+                // Standard Scheme
+                if (isExplicit)
+                {
+                    nEqn -= fvc::div(surfaceFlux_[i], n);
+                }
+                else
+                {
+                    nEqn += fvm::div(surfaceFlux_[i], n);
+                }
+                // Diffusion is always implicit for DD
+                nEqn -= fvm::laplacian(*D, n);
+            }
+            else
+            {
+                FatalIOErrorInFunction(sDict)
+                    << "Species '" << sName 
+                    << "': Invalid driftDiffusionFluxScheme '" << scheme 
+                    << "'. Valid: 'standard', 'ScharfetterGummel'."
+                    << exit(FatalIOError);
+            }
+        }
+        else
+        {
+            // Check for invalid configuration
+            if (scheme != "standard")
+            {
+                FatalIOErrorInFunction(sDict)
+                    << "Species '" << sName 
+                    << "': 'driftDiffusionFluxScheme' cannot be set to '" 
+                    << scheme << "' when using transportModel '" 
+                    << modelName << "'. Only 'standard' is allowed." 
+                    << exit(FatalIOError);
+            }
+
+            if (isExplicit)
+            {
+                nEqn -= fvc::div(surfaceFlux_[i], n);
+            }
+            else
+            {
+                nEqn += fvm::div(surfaceFlux_[i], n);
+            }
+        }
+
+        nEqn.solve();
     }
 }
 

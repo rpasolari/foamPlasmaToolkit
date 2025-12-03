@@ -29,7 +29,10 @@ if (!coupled)
             fvm::laplacian(epsilonDielectric,ePotentialDielectric)
         );
 
-        LaplaceEquation.relax();
+        if (nonOrth < nonOrthoCorrCoupled)
+        {
+            LaplaceEquation.relax();
+        }
 
         auto sp = LaplaceEquation.solve();
 
@@ -47,7 +50,10 @@ else
             fvm::laplacian(epsilonDielectric,ePotentialDielectric)
         );
 
-        LaplaceEquation.relax();
-
+        // if (nonOrth < nonOrthoCorrCoupled)
+        // {
+        //     LaplaceEquation.relax();
+        // }
+        
         fvMatrixAssemblyPtr->addFvMatrix(LaplaceEquation);
 }

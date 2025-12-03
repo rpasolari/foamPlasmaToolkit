@@ -96,30 +96,3 @@ if (!foundAnyRegionMaxIter)
 {
     ePotentialNonCoupledLoopMaxIter = 100;
 }
-
-// Print settings only in segregated mode
-if (!coupled)
-{
-    Info<< "*** Segregated electric potential controls:" << nl
-        << "   - Max iterations: " << ePotentialNonCoupledLoopMaxIter << nl;
-
-    Info<< "   - (Gas region) " << gasRegionName
-        << " : nNonOrth=" << nNonOrthoCorr
-        << " , tolerance: " << ePotentialNonCoupledTolerance << nl;
-        
-    forAll(dielectricRegions, i)
-    {
-        Info<< "   - (Dielectric region) " << dielectricRegions[i].name()
-            << " : nNonOrth=" << nNonOrthoCorrDielectricList[i]
-            << " , tolerance: "
-            << ePotentialNonCoupledToleranceDielectricList[i] << nl;
-    }
-    Info<< endl;
-}
-else
-{
-    Info<< "*** Monolithic electric potential controls:" << nl
-        << "   - Using maximum nNonOrthogonalCorrectors across all regions: "
-        << nonOrthoCorrCoupled << nl
-        << endl;
-}

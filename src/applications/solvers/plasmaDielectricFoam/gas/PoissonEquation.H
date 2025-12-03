@@ -34,9 +34,12 @@ if (!coupled)
                 -chargeDensity
             );
 
-            PoissonEquation.relax();
-
             fvOptions.constrain(PoissonEquation);
+
+            if (nonOrth < nNonOrthoCorr)
+            {
+                PoissonEquation.relax();
+            }
 
             auto sp = PoissonEquation.solve();
 
@@ -64,9 +67,12 @@ if (!coupled)
                 - deltaT * transport.elecDiffusionCharge()
             );
 
-            PoissonEquation.relax();
-
             fvOptions.constrain(PoissonEquation);
+
+            if (nonOrth < nNonOrthoCorr)
+            {
+                PoissonEquation.relax();
+            }
 
             auto sp = PoissonEquation.solve();
 
@@ -96,9 +102,12 @@ else
             -chargeDensity
         );
 
-        PoissonEquation.relax();
-
         fvOptions.constrain(PoissonEquation);
+
+        // if (nonOrth < nonOrthoCorrCoupled)
+        // {
+        //     PoissonEquation.relax();
+        // }
 
         fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
     }
@@ -121,9 +130,12 @@ else
             -deltaT * transport.elecDiffusionCharge()
         );
 
-        PoissonEquation.relax();
-
         fvOptions.constrain(PoissonEquation);
+
+        // if (nonOrth < nonOrthoCorrCoupled)
+        // {
+        //     PoissonEquation.relax();
+        // }
 
         fvMatrixAssemblyPtr->addFvMatrix(PoissonEquation);
     }

@@ -12,13 +12,6 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-ePotential.correctBoundaryConditions();
-
-forAll(dielectricRegions, i)
-{
-    ePotentialDielectricList[i].correctBoundaryConditions();
-}
-
 for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
 {
     {
@@ -39,6 +32,13 @@ for (int nonOrth = 0; nonOrth <= nonOrthoCorrCoupled; ++nonOrth)
     }
 
     fvMatrixAssemblyPtr->solve();
+
+    ePotential.correctBoundaryConditions();
+
+    forAll(dielectricRegions, i)
+    {
+        ePotentialDielectricList[i].correctBoundaryConditions();
+    }
 
     if (nonOrth == nonOrthoCorrCoupled)
     {

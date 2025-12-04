@@ -45,6 +45,10 @@ Usage
     Example:
         foamPlasmaCreateSpeciesFields -case plasmaCase
 
+        or 
+
+        mpirun -np 4 foamPlasmaCreateFields -parallel
+
 Author
     Rention Pasolari
     Contact: r.pasolari@gmail.com
@@ -55,7 +59,7 @@ Author
 #include "regionProperties.H"
 #include "fvMesh.H"
 #include "IOdictionary.H"
-#include <fstream>
+#include "volFields.H"
 
 using namespace Foam;
 
@@ -69,9 +73,15 @@ int main(int argc, char* argv[])
     );
 
     argList::noBanner();
-    argList::noParallel();
     argList::noJobInfo();
     argList::noFunctionObjects();
+
+    argList::addOption
+    (
+        "dict",
+        "file",
+        "Alternative plasmaSpecies dictionary"
+    );
 
     argList args(argc, argv);
 
@@ -85,13 +95,16 @@ int main(int argc, char* argv[])
 
     word gasRegionName;
 
+    fileName globalConstantDir = runTime.globalPath()/"constant";
     fileName regionPropsFile = runTime.constant()/"regionProperties";
 
     // Find the gas region, or default region in single region cases
     if (isFile(regionPropsFile))
     {
-        Info << "Found regionProperties: "
-            << regionPropsFile << nl;
+        if (Pstream::master())
+        {
+            Info << "Found regionProperties: " << regionPropsFile << nl;
+        }
 
         regionProperties rp(runTime);
 
@@ -120,19 +133,20 @@ int main(int argc, char* argv[])
             // Exactly one gas region
             gasRegionName = names[0];
 
-            Info << "Detected gas region: "
-                << gasRegionName << nl;
+            if (Pstream::master())
+            {
+                Info << "Detected gas region: " << gasRegionName << nl;
+            }
         }
     }
 
     // Report region used
-    if (gasRegionName.empty())
+    if (Pstream::master())
     {
-        Info << "No gas region found → using constant/ as search path." << nl;
-    }
-    else
-    {
-        Info << "Using region: " << gasRegionName << nl;
+        if (gasRegionName.empty())
+            Info << "No gas region found → using constant/ as path." << nl;
+        else
+            Info << "Using region: " << gasRegionName << nl;
     }
 
     fileName plasmaSpeciesPath;
@@ -141,7 +155,7 @@ int main(int argc, char* argv[])
     if (!gasRegionName.empty())
     {
         // Multi-region path
-        fileName regionDir = runTime.constant()/gasRegionName;
+        fileName regionDir = globalConstantDir/gasRegionName;
 
         if (isFile(regionDir/"plasmaSpecies"))
         {
@@ -172,7 +186,10 @@ int main(int argc, char* argv[])
     }
 
     // Read plasmaSpecies dict
-    Info << "Reading plasmaSpecies from: " << plasmaSpeciesPath << nl;
+    if (Pstream::master())
+    {
+        Info << "Reading plasmaSpecies from: " << plasmaSpeciesPath << nl;
+    }
 
     IOdictionary speciesDict
     (
@@ -195,7 +212,10 @@ int main(int argc, char* argv[])
 
     wordList species(speciesDict.lookup("species"));
 
-    Info << "Found " << species.size() << " species:" << nl;
+    if (Pstream::master())
+    {
+        Info << "Found " << species.size() << " species." << nl;
+    }
 
     for (const word& s : species)
     {
@@ -218,102 +238,46 @@ int main(int argc, char* argv[])
         )
     );
 
-    Info << "Boundaries: " << nl;
+    // Field Creation Loop
+    dimensionSet dimDensity(0, -3, 0, 0, 0, 0, 0);
 
-    // Loop over patches
-    const polyBoundaryMesh& patches = mesh.boundaryMesh();
-
-    for (const polyPatch& p : patches)
-    {
-        Info << "  - " << p.name() << nl;
-    }
-
-    // Determine correct "0" directory
-    fileName zeroDir;
-
-    if (gasRegionName.empty())
-    {
-        zeroDir = runTime.path()/"0";
-    }
-    else
-    {
-        zeroDir = runTime.path()/"0"/gasRegionName;
-    }
-
-    // Ensure directory exists
-    mkDir(zeroDir);
-
-    Info << nl << "Creating species number-density fields in: "
-         << zeroDir << nl;
-
-    // Loop over species
     for (const word& s : species)
     {
         const word fieldName = "n_" + s;
-        const fileName fieldPath = zeroDir/fieldName;
 
-        Info << "  - Creating field: " << fieldName << nl;
+        if (Pstream::master())
+        {
+            Info << "Creating field: " << fieldName << endl;
+        }
 
-        // Construct volScalarField
-        IOdictionary header
+        // Create the field using the specific constructor that sets:
+        // 1. Internal Field Value (0)
+        // 2. Physical Boundary Type (zeroGradient)
+        // 3. Processor Boundary Type (calculated automatically)
+        volScalarField nSpecies
         (
             IOobject
             (
                 fieldName,
                 runTime.timeName(),
-                gasRegionName,  // empty for default region
-                runTime,
+                mesh,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
-            )
+            ),
+            mesh,
+            dimensionedScalar("zero", dimDensity, 0.0),
+            word("zeroGradient")
         );
 
-        // Write to file manually using standard C++ ofstream
-        std::ofstream os(fieldPath.c_str());
+        // Write the field
+        // In serial: writes to case/0/
+        // In parallel: writes to case/processorN/0/
+        nSpecies.write();
+    }
 
-        if (!os)
-        {
-            FatalErrorInFunction
-                << "Cannot open file for writing: " << fieldPath << nl
-                << exit(FatalError);
-        }
-
-        os << "/*--------------------------------*- C++ -*----------------------------------*\\\n"
-              "| =========                 |                                                 |\n"
-              "| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n"
-              "|  \\\\    /   O peration     | Version:  v2412                                 |\n"
-              "|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n"
-              "|    \\\\/     M anipulation  |                                                 |\n"
-              "\\*---------------------------------------------------------------------------*/\n";
-
-        os << "FoamFile\n"
-              "{\n"
-              "    version     2.0;\n"
-              "    format      ascii;\n"
-              "    class       volScalarField;\n"
-              "    object      " << fieldName << ";\n"
-              "}\n"
-              "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n";
-
-        os << "dimensions      [0 -3 0 0 0 0 0];\n\n";
-        os << "internalField   uniform 0;\n\n";
-
-        os << "boundaryField\n{\n";
-
-        // Write each boundary patch with zeroGradient
-        const polyBoundaryMesh& patches2 = mesh.boundaryMesh();
-        for (const polyPatch& p : patches2)
-        {
-            os << "    " << p.name() << "\n"
-               << "    {\n"
-               << "        type    zeroGradient;\n"
-               << "    }\n\n";
-        }
-
-        os << "}\n\n";
-        os << "// ************************************************************************* //\n";
-
-        os.close();
+    if (Pstream::master())
+    {
+        Info << nl << "Fields created successfully." << nl;
     }
 
     return 0;

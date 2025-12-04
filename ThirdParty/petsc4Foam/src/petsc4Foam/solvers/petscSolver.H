@@ -88,6 +88,9 @@ class petscSolver
         //- Solution name used as prefix
         word prefix_;
 
+        //- Use or not coupled assembly
+        bool useCoupledAssembly_;
+
 
     // Private Member Functions
 

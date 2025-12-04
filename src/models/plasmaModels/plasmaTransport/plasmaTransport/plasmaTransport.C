@@ -188,7 +188,6 @@ void plasmaTransport::correct()
                         << "Scharfetter-Gummel requires implicit coupling."
                         << endl;
                 }
-                
                 nEqn += fvm::ScharfetterGummel(n, surfaceFlux_[i], *D);
             }
             else if (scheme == "standard")

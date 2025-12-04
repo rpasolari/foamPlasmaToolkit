@@ -108,8 +108,12 @@ Foam::petscSolver::petscSolver
     ),
     petscDict_(solverControls.subDict("petsc")),
     eqName_(fieldName),
-    prefix_("eqn_" + eqName_ + "_")
-{}
+    prefix_("eqn_" + eqName_ + "_"),
+    useCoupledAssembly_(false)
+{
+    useCoupledAssembly_ =
+        solverControls.lookupOrDefault("implicitRegionCoupling", false);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -540,25 +544,43 @@ void Foam::petscSolver::buildMat
     
     if (f)
     {
-
-        // 0) Try to get the assembled LDU (present only when implicit coupling is used)
-        const objectRegistry& db = matrix_.mesh().thisDb();
-
-        const lduPrimitiveMeshAssembly* asmPtr = nullptr;
-
-        forAllConstIter(HashTable<regIOobject*>, db, it)
+        // IMPLICIT MODE
+        if (useCoupledAssembly_)
         {
-            const regIOobject& obj = *it();
-            if (isA<lduPrimitiveMeshAssembly>(obj))
+            Info<< "PETSc: Implicit region coupling enabled via fvSolution. Searching for assembly...\n";
+
+            const objectRegistry& db = matrix_.mesh().thisDb();
+            const lduPrimitiveMeshAssembly* asmPtr = nullptr;
+
+            forAllConstIter(HashTable<regIOobject*>, db, it)
             {
-                asmPtr = &refCast<const lduPrimitiveMeshAssembly>(obj);
-                break;
+                if (isA<lduPrimitiveMeshAssembly>(*it()))
+                {
+                    asmPtr = &refCast<const lduPrimitiveMeshAssembly>(*it());
+                    break;
+                }
             }
-        }
 
-    // IMPLICIT MODE
-        if (asmPtr)
-        {
+            // 1. Check if assembly exists
+            if (!asmPtr)
+            {
+                FatalErrorInFunction
+                    << "Solver set to 'implicitRegionCoupling true', but no lduPrimitiveMeshAssembly found in registry!"
+                    << exit(FatalError);
+            }
+
+            // 2. [THE OTHER WAY CHECK] Sanity Check: Does Assembly Size == Matrix Size?
+            // If the matrix given to this solver is smaller than the global assembly,
+            // something is wrong (e.g., trying to solve n_e with coupling=true).
+            if (asmPtr->lduAddr().size() != nrows_)
+            {
+                FatalErrorInFunction
+                    << "Solver set to Implicit Region Coupling Mode, but Matrix Size (" << nrows_ 
+                    << ") does not match Assembly Size (" << asmPtr->lduAddr().size() << ")." << nl
+                    << "You might be trying to solve a single-region field (like n_e) with 'implicitRegionCoupling true'."
+                    << exit(FatalError);
+            }
+
             Info<< "PETSc: detected implicit LDU assembly in registry\n";
 
             // Use ASSEMBLED addressing and interfaces from the assembly
@@ -818,7 +840,64 @@ void Foam::petscSolver::buildMat
         // EXPLICIT MODE
         else
         {
-            Info<< "PETSc: no LDU assembly found — proceeding with explicit mode\n";
+            // Check if an assembly exists in the registry
+            const objectRegistry& db = matrix_.mesh().thisDb();
+            const lduPrimitiveMeshAssembly* asmPtr = nullptr;
+
+            forAllConstIter(HashTable<regIOobject*>, db, it)
+            {
+                if (isA<lduPrimitiveMeshAssembly>(*it()))
+                {
+                    asmPtr = &refCast<const lduPrimitiveMeshAssembly>(*it());
+                    break;
+                }
+            }
+
+            if (asmPtr)
+            {
+                // ---------------------------------------------------------
+                // ERROR CHECK: Should this have been coupled?
+                // ---------------------------------------------------------
+                
+                // 1. Check if Local Matrix Size == Local Assembly Size
+                bool localSizeMatch = (nrows_ == asmPtr->lduAddr().size());
+
+                // 2. Check if GLOBALLY the sizes match everywhere
+                // (If n_e exists only on gas processors, localSizeMatch will be false 
+                // on dielectric processors, so globalMatch will be false. This is good.)
+                bool globalSizeMatch = localSizeMatch;
+                if (UPstream::parRun())
+                {
+                    reduce(globalSizeMatch, andOp<bool>());
+                }
+
+                // 3. Trigger Error
+                // If the matrix matches the full assembly size everywhere, 
+                // but 'useCoupledAssembly_' (from fvSolution) is false, STOP.
+                if (globalSizeMatch)
+                {
+                    FatalErrorInFunction
+                        << "Solver is set to 'coupled false' (Explicit Mode), but the matrix size matches "
+                        << "the global LDU Assembly size exactly (" << nrows_ << " rows)." << nl
+                        << "This indicates that field '" << fieldName_ << "' spans the entire coupled domain "
+                        << "and should likely be solved in Coupled Mode." << nl
+                        << "Action: Set 'implicitRegionCoupling true;' for '" << fieldName_ << "' in fvSolution."
+                        << exit(FatalError);
+                }
+
+                // ---------------------------------------------------------
+                // Informational Print for n_e
+                // ---------------------------------------------------------
+                if (Pstream::master())
+                {
+                    Info<< "PETSc: Global Assembly exists, but '" << fieldName_ << "' is smaller/different. "
+                        << "Proceeding with EXPLICIT (segregated) solve." << endl;
+                }
+            }
+            else
+            {
+                Info<< "PETSc: No LDU assembly found — proceeding with standard EXPLICIT mode.\n";
+            }
 
             const globalIndex globalNumbering_(nrows_);
 

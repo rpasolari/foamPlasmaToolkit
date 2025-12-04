@@ -30,20 +30,20 @@ Description
     This function builds a coupled fvMatrix for the transport equation:
         div(J) = Source
     Where the total flux J is defined as:
-        J = phiDrift * psi - D * grad(psi)
+        J = phiDrift * V - D * grad(V)
 
     This scheme solves the 1D convection-diffusion equation analytically 
     between cell centers (assuming constant E and D locally) to determine 
     the exponential profile of the scalar field. This ensures positivity 
     of the species density even in regions of high electric fields (sheaths) 
-    where standard central or upwind schemes may fail or produce oscillations
+    where standard central or upwind schemes may fail or produce oscillations.
+    For a detailed theoretical derivation, please refer to:
+    docs/theory/scharfetter_gummel.md
 
 References
     Scharfetter, D. L., & Gummel, H. K. (1969).
     "Large-Signal Analysis of a Silicon Read Diode Oscillator."
     IEEE Transactions on Electron Devices, 16(1), 64–77.
-
-SourceFiles
     
 \*---------------------------------------------------------------------------*/
 
@@ -103,10 +103,10 @@ namespace fvm
                 return 1.0 - x/2.0 + sqr(x)/12.0 - pow4(x)/720.0;
             }
             // Limit 2: B(200) = 0 effectively
-            if (x > 200)        return 0.0;
+            if (x > 200)    return 0.0;
 
             // Limit 3: At x -> -inf, B(x) = -x
-            if (x < -200)       return -x;
+            if (x < -200)   return -x;
 
             // Standard calculation
             return x / (exp(x) - 1.0); 
@@ -138,22 +138,28 @@ namespace fvm
         {
             const fvPatchField<Type>& ptf = rho.boundaryField()[patchi];
 
-            if (ptf.coupled()) continue;
-
             scalarField& intCoeffs = mat.internalCoeffs()[patchi];
             scalarField& bdryCoeffs = mat.boundaryCoeffs()[patchi];
 
             const auto& magSf = mesh.magSf().boundaryField()[patchi];
             const auto& delta = mesh.deltaCoeffs().boundaryField()[patchi];
-
             const auto& DfPatch = Df.boundaryField()[patchi];
             const auto& phiDriftPatch = phiDrift.boundaryField()[patchi];
 
-            tmp<scalarField> tStdInt = ptf.valueInternalCoeffs(rho);
-            tmp<scalarField> tStdBdry = ptf.valueBoundaryCoeffs(rho);
+            // We only fetch these for phusical boundaries.
+            // Calling them on coupled patches is unnecessary and can be unsafe.
+            const scalarField* alphaPtr = nullptr;
+            const scalarField* betaPtr = nullptr;
+            tmp<scalarField> tAlpha;
+            tmp<scalarField> tBeta;
 
-            const scalarField& stdInt = tStdInt();
-            const scalarField& stdBdry = tStdBdry();
+            if (!ptf.coupled())
+            {
+                tAlpha = ptf.valueInternalCoeffs(rho);
+                tBeta  = ptf.valueBoundaryCoeffs(rho);
+                alphaPtr = &tAlpha();
+                betaPtr  = &tBeta();
+            }
 
             forAll(ptf, facei)
             {
@@ -162,26 +168,20 @@ namespace fvm
                 scalar driftFlux = phiDriftPatch[facei];
                 scalar Pe = driftFlux / (diffCond + VSMALL);
 
-                scalar w_P = diffCond * Bern(-Pe);
-                scalar w_b = diffCond * Bern(Pe);
-                // CASE A: BC fixes VALUE (Dirichlet)
-                // e.g., fixedValue, timeVaryingMapped, OhmicContact
-                if (ptf.fixesValue())
+                scalar coeffP = diffCond * Bern(-Pe);
+                scalar coeffB = diffCond * Bern(Pe);
+                if (ptf.coupled())
                 {
-                    // Diagonal Term (multiplies rho_P)
-                    intCoeffs[facei] = w_P;
-
-                    // Source Term (multiplies rho_b)
-                    bdryCoeffs[facei] = w_b;
+                    intCoeffs[facei] = coeffP;
+                    bdryCoeffs[facei] = coeffB;
                 }
-                // CASE B: BC fixes FLUX or GRADIENT (Neumann/Robin)
-                // e.g., zeroGradient, fixedGradient, mixed
                 else
                 {
-                    scalar netFluxCoeff = w_P - w_b;
+                    const scalar alpha = (*alphaPtr)[facei];
+                    const scalar beta = (*betaPtr)[facei];
 
-                    intCoeffs[facei] = netFluxCoeff;
-                    bdryCoeffs[facei] = 0.0;
+                    intCoeffs[facei] = coeffP - (coeffB * alpha);
+                    bdryCoeffs[facei] = coeffB * beta;        
                 }
             }
         }

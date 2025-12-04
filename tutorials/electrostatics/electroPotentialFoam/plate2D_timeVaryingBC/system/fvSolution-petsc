@@ -18,6 +18,7 @@ solvers
     ePotential
     {  
         solver petsc;
+        implicitRegionCoupling true;
 
         petsc
         {

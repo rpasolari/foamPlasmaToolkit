@@ -14,7 +14,7 @@
 
 PtrList<volScalarField> ePotentialFluid(fluidRegions.size());
 PtrList<volScalarField> eChargeFluid(fluidRegions.size());
-PtrList<surfaceScalarField> surfChargeFluid(fluidRegions.size());
+PtrList<volScalarField> surfChargeFluid(fluidRegions.size());
 PtrList<IOdictionary> electricPropertiesDictFluid(fluidRegions.size());
 PtrList<dimensionedScalar> epsilonFluid(fluidRegions.size());
 
@@ -66,39 +66,24 @@ forAll(fluidRegions, i)
         )
     );
 
-    {
-        IOobject surfChargeHeader
+    Info << "   Adding to surfChargeFluid\n" << endl;
+    surfChargeFluid.set
+    (
+        i,
+        new volScalarField
         (
-            "surfCharge",
-            runTime.timeName(),
-            fluidRegions[i],
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        );
-
-        if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
-        {
-            surfChargeFluid.set
+            IOobject
             (
-                i,
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "surfCharge",
-                        runTime.timeName(),
-                        fluidRegions[i],
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    fluidRegions[i]
-                )
-            );
-
-            regIOobject::store(&surfChargeFluid[i]);
-            Info << "   Adding to surfChargeFluid\n" << endl;
-        }
-    }
+                "surfCharge",
+                runTime.timeName(),
+                fluidRegions[i],
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            fluidRegions[i],
+            dimensionedScalar("zero", dimensionSet(0, -2, 1, 0, 0, 1, 0), 0.0)
+        )
+    );
 
     electricPropertiesDictFluid.set
     (

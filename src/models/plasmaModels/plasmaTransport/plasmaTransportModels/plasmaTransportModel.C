@@ -40,7 +40,8 @@ plasmaTransportModel::plasmaTransportModel
     species_(species),
     dict_(dict),
     specieIndex_(specieIndex),
-    E_(E)
+    E_(E),
+    fluxScheme_("standard")
 {}
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //

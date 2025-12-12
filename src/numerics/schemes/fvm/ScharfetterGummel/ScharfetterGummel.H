@@ -22,21 +22,32 @@ License
     with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::plasmaTimeControl
+    Foam::fvm::ScharfetterGummel
 
 Description
-    Scharfetter-Gummel finite volume operator for drift-diffusion.
+
+    Scharfetter-Gummel finite volume matrix operator for drift-diffusion.
 
     This function builds a coupled fvMatrix for the transport equation:
         div(J) = Source
-    Where the total flux J is defined as:
-        J = phiDrift * V - D * grad(V)
+
+    Where the total advective-diffusive flux J is defined as:
+        J = phiDrift * rho - D * grad(rho)
 
     This scheme solves the 1D convection-diffusion equation analytically 
     between cell centers (assuming constant E and D locally) to determine 
     the exponential profile of the scalar field. This ensures positivity 
     of the species density even in regions of high electric fields (sheaths) 
     where standard central or upwind schemes may fail or produce oscillations.
+
+    The matrix coefficients are derived from the flux expression:
+        J_f = D/h * [ B(-Pe) * rho_P  -  B(Pe) * rho_N ]
+
+    Where:
+      - Pe is the local Peclet number: phiDrift / (D/h)
+      - B(x) is the Bernoulli function: x / (exp(x) - 1)
+      - rho_P, rho_N are the cell-center values of owner and neighbour.
+
     For a detailed theoretical derivation, please refer to:
     docs/theory/scharfetter_gummel.md
 
@@ -55,7 +66,6 @@ References
 #include "fvc.H"
 #include "surfaceFields.H"
 #include "volFields.H"
-#include "cmath"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,12 +102,13 @@ namespace fvm
         const labelList& owner = mesh.owner();
         const labelList& neighbour = mesh.neighbour();
 
+        // Interpolate diffusivity
         surfaceScalarField Df = fvc::interpolate(D);
 
         // Bernoulli Function Definition: B(x) = x / exp(x) - 1
         auto Bern = [](scalar x) -> scalar
         {
-            // Limit 1: SIngularity at x = 0
+            // Limit 1: Singularity at x = 0
             if (mag(x) < 1e-4) 
             {
                 return 1.0 - x/2.0 + sqr(x)/12.0 - pow4(x)/720.0;
@@ -117,12 +128,14 @@ namespace fvm
         {
             label P = owner[facei];
             label N = neighbour[facei];
-            scalar faceArea = magSf[facei];
 
-            scalar diffCond = Df[facei] * faceArea * deltaCoeffs[facei];
+            scalar diffCond = Df[facei] * magSf[facei] * deltaCoeffs[facei];
             scalar driftFlux = phiDrift[facei];
+
+            // Local Peclet number
             scalar Pe = driftFlux / (diffCond + VSMALL);
 
+            // Bernoulli weights
             scalar coeffP = diffCond * Bern(-Pe);
             scalar coeffN = diffCond * Bern(Pe);
 

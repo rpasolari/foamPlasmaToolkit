@@ -59,12 +59,12 @@ if (!coupled)
 
             fvScalarMatrix PoissonEquation(
                 fvm::laplacian(
-                    epsilon + deltaT * transport.elecConductionCoeff(),
+                    epsilon + deltaT * transport.electricalConductivity(),
                     ePotential
                 )
             ==
                 -chargeDensity
-                - deltaT * transport.elecDiffusionCharge()
+                - deltaT * transport.diffusiveChargeSource()
             );
 
             fvOptions.constrain(PoissonEquation);
@@ -122,12 +122,12 @@ else
 
         fvScalarMatrix PoissonEquation(
             fvm::laplacian(
-                epsilon + deltaT * transport.elecConductionCoeff(),
+                epsilon + deltaT * transport.electricalConductivity(),
                 ePotential
             )
         ==
             -chargeDensity
-            -deltaT * transport.elecDiffusionCharge()
+            -deltaT * transport.diffusiveChargeSource()
         );
 
         fvOptions.constrain(PoissonEquation);

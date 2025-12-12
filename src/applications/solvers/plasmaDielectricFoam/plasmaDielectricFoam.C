@@ -43,9 +43,10 @@ Author
 #include "fvOptions.H"
 #include "coordinateSystem.H"
 #include "loopControl.H"
-
 #include "fvSolution.H"
 #include "solutionControl.H"
+#include "mappedPatchBase.H"
+#include "solidSurfaceFluxFvPatchScalarField.H"
 
 #include "foamPlasmaToolkitConstants.H"
 #include "plasmaSpecies.H"
@@ -78,6 +79,7 @@ int main(int argc, char *argv[])
     #include "readElectricPotentialControls.H"
 
     #include "reportSimulationSummary.H"
+    #include "updateChargeDensity.H"
 
     Info<< "\nStarting iteration loop\n" << endl;
 
@@ -88,9 +90,6 @@ int main(int argc, char *argv[])
         Info << "Time = " << runTime.timeName() << nl << endl;
 
         timeControl.adjustDeltaT(transport);
-        
-        // Update charge density (ρ = Z * e *n)
-        #include "updateChargeDensity.H"
 
         // Solve the Poisson/Laplace Equation (electric potential)
         if(coupled)
@@ -106,6 +105,9 @@ int main(int argc, char *argv[])
         #include "calculateElectricField.H"
 
         transport.correct();
+
+        #include "updateChargeDensity.H"
+        #include "updateSurfCharge.H"
 
         runTime.write();
         runTime.printExecutionTime(Info);

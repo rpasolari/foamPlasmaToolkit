@@ -1,1 +1,1 @@
-../schemes/ScharfetterGummel/ScharfetterGummel.C
+../schemes/fvm/ScharfetterGummel/ScharfetterGummel.C

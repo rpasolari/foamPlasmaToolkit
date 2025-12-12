@@ -44,6 +44,7 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
     nSpecies_(0),
     speciesChargeNumber_(),
     speciesCharge_(),
+    speciesMass_(),
     numberDensity_()
 {
     if (!found("species"))
@@ -66,6 +67,7 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
 
     speciesChargeNumber_.setSize(nSpecies_);
     speciesCharge_.setSize(nSpecies_);
+    speciesMass_.setSize(nSpecies_);
     numberDensity_.setSize(nSpecies_);
 
     // Read species properties dictionary
@@ -121,6 +123,7 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
         }
 
         speciesChargeNumber_[i] = readScalar(mergedDict.lookup("charge"));
+        scalar massValue = readScalar(mergedDict.lookup("mass"));
 
         speciesCharge_.set
         (
@@ -130,6 +133,17 @@ plasmaSpecies::plasmaSpecies(const fvMesh& mesh)
                 "q_" + speciesNames_[i],
                 constant::plasma::eCharge.dimensions(),
                 speciesChargeNumber_[i] * constant::plasma::eCharge.value()
+            )
+        );
+
+        speciesMass_.set
+        (
+            i,
+            new dimensionedScalar
+            (
+                "m_" + speciesNames_[i],
+                constant::plasma::eMass.dimensions(),
+                massValue
             )
         );
 

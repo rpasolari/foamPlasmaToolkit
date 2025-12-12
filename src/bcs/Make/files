@@ -1,0 +1,8 @@
+coupledElectricPotential/coupledElectricPotentialFvPatchScalarField.C
+
+speciesDensity/solidSurfaceFlux/base/solidSurfaceFluxFvPatchScalarField.C
+speciesDensity/solidSurfaceFlux/electronSolidSurfaceFlux/electronSolidSurfaceFluxFvPatchScalarField.C
+speciesDensity/solidSurfaceFlux/ionSolidSurfaceFlux/ionSolidSurfaceFluxFvPatchScalarField.C
+speciesDensity/solidSurfaceFlux/neutralSolidSurfaceFlux/neutralSolidSurfaceFluxFvPatchScalarField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libplasmaBCs

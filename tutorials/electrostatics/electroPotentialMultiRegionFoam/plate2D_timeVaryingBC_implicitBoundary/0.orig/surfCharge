@@ -9,7 +9,7 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       surfaceScalarField;
+    class       volScalarField;
     location    "0";
     object      surfCharge;
 }
@@ -26,8 +26,6 @@ boundaryField
         type    fixedValue;
         value   $internalField;
     }
-
-    #include "$FOAM_PLASMA_ETC/caseDicts/setConstraintTypesForSurfaceScalarFields"
 }
 
 // ************************************************************************* //

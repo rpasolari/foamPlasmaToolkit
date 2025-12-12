@@ -16,7 +16,7 @@
 
 volScalarField& ePotentialDielectric = ePotentialDielectricList[i];
 volVectorField& EDielectric = EDielectricList[i];
-surfaceScalarField* surfChargeDielectric = surfChargeDielectricList.set(i)
+volScalarField* surfChargeDielectric = surfChargeDielectricList.set(i)
                                             ? &surfChargeDielectricList[i]
                                             : nullptr;
 

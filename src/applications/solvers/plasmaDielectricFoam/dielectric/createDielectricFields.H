@@ -16,7 +16,7 @@ PtrList<volScalarField> ePotentialDielectricList(dielectricRegions.size());
 PtrList<volVectorField> EDielectricList(dielectricRegions.size());
 PtrList<IOdictionary>
     electricPropertiesDictDielectricList(dielectricRegions.size());
-PtrList<surfaceScalarField> surfChargeDielectricList(dielectricRegions.size());
+PtrList<volScalarField> surfChargeDielectricList(dielectricRegions.size());
 PtrList<dimensionedScalar> epsilonDielectricList(dielectricRegions.size());
 
 List<scalar> epsilonRDielectricList(dielectricRegions.size());
@@ -73,39 +73,24 @@ forAll(dielectricRegions, i)
         )
     );
 
-    {
-        IOobject surfChargeHeader
+    Info << "   Adding to surfChargeDielectric\n" << endl;
+    surfChargeDielectricList.set
+    (
+        i,
+        new volScalarField
         (
-            "surfCharge",
-            runTime.timeName(),
-            dielectricRegions[i],
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        );
-
-        if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
-        {
-            surfChargeDielectricList.set
+            IOobject
             (
-                i,
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "surfCharge",
-                        runTime.timeName(),
-                        dielectricRegions[i],
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    dielectricRegions[i]
-                )
-            );
-
-            regIOobject::store(&surfChargeDielectricList[i]);
-            Info << "   Adding to surfChargeDielectric\n" << endl;
-        }
-    }
+                "surfCharge",
+                runTime.timeName(),
+                dielectricRegions[i],
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            dielectricRegions[i],
+            dimensionedScalar("zero", dimensionSet(0, -2, 1, 0, 0, 1, 0), 0.0)
+        )
+    );
 
     electricPropertiesDictDielectricList.set
     (

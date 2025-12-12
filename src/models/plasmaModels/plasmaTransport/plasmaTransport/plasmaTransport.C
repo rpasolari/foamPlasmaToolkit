@@ -11,7 +11,6 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "ScharfetterGummel.H"
 #include "plasmaTransport.H"
 #include "plasmaTransportModel.H"
 
@@ -64,27 +63,64 @@ plasmaTransport::plasmaTransport
     const volVectorField& E
 )
 :
+    regIOobject
+    (
+        IOobject
+        (
+            "plasmaTransport",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    ),
     mesh_(mesh),
     species_(species),
     E_(E),
     transportModels_(species.nSpecies()),
-    flux_(),
-    surfaceFlux_()
+    particleFlux_(),
+    Gamma_()
 {
     constructModels();
 
-    flux_.setSize(species.nSpecies());
-    surfaceFlux_.setSize(species.nSpecies());
+    particleFlux_.setSize(species.nSpecies());
+    Gamma_.setSize(species.nSpecies());
+
     for (label i = 0; i < species.nSpecies(); ++i)
     {
-        flux_.set
+        // Surface Scalar Field
+        particleFlux_.set
+        (
+            i,
+            new surfaceScalarField
+            (
+                IOobject
+                (
+                    "particleFlux_" + species.speciesNames()[i], 
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh_,
+                dimensionedScalar
+                (
+                    "zero",
+                    dimensionSet(0, 0, -1, 0, 0, 0, 0), 
+                    0.0
+                )
+            )
+        );
+
+        // Volumetric Vector Field
+        Gamma_.set
         (
             i,
             new volVectorField
             (
                 IOobject
                 (
-                    "Gamma_" + species.speciesNames()[i], 
+                    "Gamma_" + species.speciesNames()[i],
                     mesh_.time().timeName(),
                     mesh_,
                     IOobject::NO_READ,
@@ -99,28 +135,6 @@ plasmaTransport::plasmaTransport
                 )
             )
         );
-
-        surfaceFlux_.set
-        (
-            i,
-            new surfaceScalarField
-            (
-                IOobject
-                (
-                    "phi_" + species.speciesNames()[i],
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                mesh_,
-                dimensionedScalar
-                (
-                    "zero",
-                    dimensionSet(0, 3, -1, 0, 0, 0, 0),
-                    0.0)
-            )
-        );
     }
 }
 
@@ -132,180 +146,97 @@ void plasmaTransport::correct()
 
     for (label i = 0; i < nSpecies; ++i)
     {
-        const word& sName = species_.speciesNames()[i];
-        const dictionary& sDict = species_.speciesDict(i);
-
+        // Update coefficients (mobility, diffusivity, driftVelocity etc.)
         transportModels_[i].correct();
 
-        const volVectorField& U = transportModels_[i].driftVelocity();
+        // Build the matrix
+        tmp<fvScalarMatrix> tEqn = transportModels_[i].nEqn();
+        fvScalarMatrix& nEqn = tEqn.ref();
 
-        surfaceFlux_[i] = fvc::flux(U);
-
-        volScalarField& n = species_.numberDensity(i);
-        fvScalarMatrix nEqn(fvm::ddt(n));
-
-        word modelName;
-        sDict.lookup("transportModel") >> modelName;
-        word advMode = sDict.lookupOrDefault<word>("advectionMode", "implicit");
-        bool isExplicit = false;
-
-        if (advMode == "explicit")
-        {
-            isExplicit = true;
-        }
-        else if (advMode != "implicit")
-        {
-            FatalIOErrorInFunction(sDict)
-                << "Species '" << sName << "': Invalid advectionMode '" 
-                << advMode << "'. Valid options: 'implicit', 'explicit'."
-                << exit(FatalIOError);
-        }
-
-        word scheme = sDict.lookupOrDefault<word>
-        (
-            "driftDiffusionFluxScheme", 
-            "standard"
-        );
-
-        if (modelName == "driftDiffusion")
-        {
-            const volScalarField* D = transportModels_[i].diffusivity();
-            if (!D)
-            {
-                FatalErrorInFunction
-                    << "DriftDiffusion model has null Diffusivity."
-                    << exit(FatalError);
-            }
-
-            if (scheme == "ScharfetterGummel")
-            {
-                // SG Scheme: Forces Implicit
-                if (isExplicit)
-                {
-                    WarningInFunction
-                        << "Species '" << sName 
-                        << "': advectionMode 'explicit' is ignored because "
-                        << "Scharfetter-Gummel requires implicit coupling."
-                        << endl;
-                }
-                nEqn += fvm::ScharfetterGummel(n, surfaceFlux_[i], *D);
-            }
-            else if (scheme == "standard")
-            {
-                // Standard Scheme
-                if (isExplicit)
-                {
-                    nEqn -= fvc::div(surfaceFlux_[i], n);
-                }
-                else
-                {
-                    nEqn += fvm::div(surfaceFlux_[i], n);
-                }
-                // Diffusion is always implicit for DD
-                nEqn -= fvm::laplacian(*D, n);
-            }
-            else
-            {
-                FatalIOErrorInFunction(sDict)
-                    << "Species '" << sName 
-                    << "': Invalid driftDiffusionFluxScheme '" << scheme 
-                    << "'. Valid: 'standard', 'ScharfetterGummel'."
-                    << exit(FatalIOError);
-            }
-        }
-        else
-        {
-            // Check for invalid configuration
-            if (scheme != "standard")
-            {
-                FatalIOErrorInFunction(sDict)
-                    << "Species '" << sName 
-                    << "': 'driftDiffusionFluxScheme' cannot be set to '" 
-                    << scheme << "' when using transportModel '" 
-                    << modelName << "'. Only 'standard' is allowed." 
-                    << exit(FatalIOError);
-            }
-
-            if (isExplicit)
-            {
-                nEqn -= fvc::div(surfaceFlux_[i], n);
-            }
-            else
-            {
-                nEqn += fvm::div(surfaceFlux_[i], n);
-            }
-        }
-
+        // Solve the transport equation
         nEqn.solve();
+
+        // Update fluxes
+        particleFlux_[i] = transportModels_[i].particleFlux();
+        Gamma_[i] = fvc::reconstruct(particleFlux_[i]);
     }
 }
 
-tmp<volScalarField> plasmaTransport::elecConductionCoeff() const
+tmp<volScalarField> plasmaTransport::electricalConductivity() const
 {
-    tmp<volScalarField> elecConductionCoeff =
-        tmp<volScalarField>::New
+    tmp<volScalarField> tSigma
+    (
+        new volScalarField
         (
-            volScalarField
+            IOobject
             (
-                IOobject
-                (
-                    "elecConductionCoeff",
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
+                "electricalConductivity",
+                mesh_.time().timeName(),
                 mesh_,
-                dimensionedScalar
-                (
-                    "zeroConduction",
-                    dimensionSet(-1,-3,3,0,0,2,0), 
-                    0.0
-                )
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar
+            (
+                "zero", 
+                dimensionSet(-1, -3, 3, 0, 0, 2, 0), 
+                0.0
             )
-        );
+        )
+    );
+
+    // Get reference
+    volScalarField& sigma = tSigma.ref();
 
     const label nSpecies = species_.nSpecies();
     for (label i = 0; i < nSpecies; ++i)
     {
-        elecConductionCoeff.ref() += transportModels_[i].elecConductionCoeff();
+        sigma.ref() += transportModels_[i].electricalConductivity();
     }
 
-    return elecConductionCoeff;
+    return tSigma;
 }
 
-tmp<volScalarField> plasmaTransport::elecDiffusionCharge() const
+tmp<volScalarField> plasmaTransport::diffusiveChargeSource() const
 {
-    tmp<volScalarField> elecDiffusionCharge =
-        tmp<volScalarField>::New
+    tmp<volScalarField> tRhoDiff
+    (
+        new volScalarField
         (
-            volScalarField
+            IOobject
             (
-                IOobject
-                (
-                    "elecDiffusionCharge",
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
+                "diffusiveChargeSource",
+                mesh_.time().timeName(),
                 mesh_,
-                dimensionedScalar
-                (
-                    "zeroDiffusionCharge",
-                    dimensionSet(0,-3,0,0,0,1,0), 
-                    0.0
-                )
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar
+            (
+                "zero", 
+                dimensionSet(0, -3, 0, 0, 0, 1, 0), 
+                0.0
             )
-        );
+        )
+    );
+
+    // Get reference
+    volScalarField& rhoDiff = tRhoDiff.ref();
 
     const label nSpecies = species_.nSpecies();
     for (label i = 0; i < nSpecies; ++i)
     {
-        elecDiffusionCharge.ref() += transportModels_[i].elecDiffusionCharge();
+        rhoDiff.ref() += transportModels_[i].diffusiveChargeSource();
     }
 
-    return elecDiffusionCharge;
+    return tRhoDiff;
+}
+
+bool plasmaTransport::writeData(Ostream& os) const
+{
+    return true;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

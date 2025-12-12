@@ -44,40 +44,21 @@ volVectorField E
     dimensionedVector("zero", dimensionSet(1, 1, -3, 0, 0, -1, 0), vector::zero)
 );
 
-autoPtr<surfaceScalarField> surfCharge;
 
-{
-    IOobject surfChargeHeader
+Info << "   Adding to surfCharge\n" << endl;
+volScalarField surfCharge
+(
+    IOobject
     (
         "surfCharge",
         runTime.timeName(),
         gasMesh(),
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
-    );
-
-    if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
-    {
-        surfCharge.reset
-        (
-            new surfaceScalarField
-            (
-                IOobject
-                (
-                    "surfCharge",
-                    runTime.timeName(),
-                    gasMesh(),
-                    IOobject::MUST_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                gasMesh()
-            )
-        );
-
-        regIOobject::store(surfCharge.ptr());
-        Info << "   Adding to surfCharge\n" << endl;
-    }
-}
+    ),
+    gasMesh(),
+    dimensionedScalar("zero", dimensionSet(0, -2, 1, 0, 0, 1, 0), 0.0)
+);
 
 IOdictionary electricPropertiesDict
 (

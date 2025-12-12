@@ -77,6 +77,10 @@ private:
     //- Mobility/Diffusivity submodels
     autoPtr<plasmaMobilityModel> mobilityModel_;
     autoPtr<plasmaDiffusivityModel> diffusivityModel_;
+    
+    //- Advection mode
+    word advectionMode_;
+    Switch isExplicit_;
 
     //- Construct mobility and diffusivity models
     void constructModels();
@@ -104,6 +108,12 @@ public:
         //- Correct model
         virtual void correct() override;
 
+        //- Return the transport equation (Matrix)
+        virtual tmp<fvScalarMatrix> nEqn() const override;
+
+        //- Return the total particle flux (Advection + Diffusion) (1/s)
+        virtual tmp<surfaceScalarField> particleFlux() const override;
+
         //- Return drift velocity
         virtual const volVectorField& driftVelocity() const override;
 
@@ -111,10 +121,11 @@ public:
         virtual const volScalarField* diffusivity() const override;
 
         //- Return electric conduction coefficient
-        virtual tmp<volScalarField> elecConductionCoeff() const override;
+        virtual tmp<volScalarField> electricalConductivity() const override;
 
         //- Return electric diffusion charge
-        virtual tmp<volScalarField> elecDiffusionCharge() const override;
+        virtual tmp<volScalarField> diffusiveChargeSource() const override;
+
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

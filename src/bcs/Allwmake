@@ -13,7 +13,7 @@ cd "${0%/*}" || exit 1
 echo ">>> Building bcs in src/bcs"
 echo "----------------------------------------------"
 
-wmake libso coupledElectricPotential/ 
+wmake libso
 
 echo "----------------------------------------------"
 echo ">>> Done building bcs."

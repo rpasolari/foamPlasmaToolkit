@@ -41,6 +41,9 @@ namespace plasma
     //- Elementary charge: default SI units: [C]
     extern const dimensionedScalar eCharge;
 
+    //- Electron mass: default SI units: [kg]
+    extern const dimensionedScalar eMass;
+
     //- Magnetic constant/permeability of free space: default SI units: [H/m]
     extern const dimensionedScalar mu0;
 
@@ -49,6 +52,9 @@ namespace plasma
 
     //- Coulomb constant: default SI units: [N.m2/C2]
     extern const dimensionedScalar kappaCoulomb;
+
+    //- Coulomb constant: default SI units: [N.m2/C2]
+    extern const dimensionedScalar kappaBoltzmann;
 
     
 

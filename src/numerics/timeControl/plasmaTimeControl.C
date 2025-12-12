@@ -98,7 +98,7 @@ void plasmaTimeControl::adjustDeltaT(const plasmaTransport& transport)
     // Dielectric relaxation (tau = epsilon / sigma)
     if (limitDielectricRelaxationRatio_)
     {
-        tmp<volScalarField> tSigma = transport.elecConductionCoeff();
+        tmp<volScalarField> tSigma = transport.electricalConductivity();
         const volScalarField& sigma = tSigma();
 
         maxSigma = gMax(mag(sigma)().primitiveField());
@@ -113,7 +113,7 @@ void plasmaTimeControl::adjustDeltaT(const plasmaTransport& transport)
     if (limitSpeciesCo_)
     {
         label speciesLabel = transport.species().speciesID(speciesName_);
-        const surfaceScalarField& phi = transport.surfaceFlux(speciesLabel);
+        const surfaceScalarField& phi = transport.particleFlux(speciesLabel);
 
         scalarField sumPhi
         (
@@ -167,7 +167,7 @@ void plasmaTimeControl::setInitialDeltaT(const plasmaTransport& transport)
     // Dielectric relaxation (tau = epsilon / sigma)
     if (limitDielectricRelaxationRatio_)
     {
-        tmp<volScalarField> tSigma = transport.elecConductionCoeff();
+        tmp<volScalarField> tSigma = transport.electricalConductivity();
         const volScalarField& sigma = tSigma();
 
         const scalar eps0 = constant::plasma::epsilon0.value();

@@ -25,6 +25,20 @@ namespace constant
 defineDimensionedConstantWithDefault
 (
     plasma::group,
+    plasma::cLight,
+    dimensionedScalar
+    (
+        "cLight",
+        dimensionSet(0, 1, -1, 0, 0, 0, 0),
+        2.99792458e8
+    ),
+    constantplasmacLight,
+    "cLight"
+);
+
+defineDimensionedConstantWithDefault
+(
+    plasma::group,
     plasma::eCharge,
     dimensionedScalar
     (
@@ -39,15 +53,15 @@ defineDimensionedConstantWithDefault
 defineDimensionedConstantWithDefault
 (
     plasma::group,
-    plasma::cLight,
+    plasma::eMass,
     dimensionedScalar
     (
-        "cLight",
-        dimensionSet(0, 1, -1, 0, 0, 0, 0),
-        2.99792458e8
+        "eMass",
+        dimensionSet(1, 0, 0, 0, 0, 0, 0),
+        9.1093837139e-31
     ),
-    constantplasmacLight,
-    "cLight"
+    constantplasmaeMass,
+    "eMass"
 );
 
 defineDimensionedConstantWithDefault
@@ -74,7 +88,7 @@ defineDimensionedConstantWithDefault
         "epsilon0",
         dimensionedScalar
         (
-            "C",
+            "epsilon0",
             dimensionSet(0, 0, 0, 0, 0),
             1.0
         )
@@ -94,7 +108,7 @@ defineDimensionedConstantWithDefault
         "kappaCoulomb",
         dimensionedScalar
         (
-            "C",
+            "kappaCoulomb",
             dimensionSet(0, 0, 0, 0, 0),
             1.0/(4.0*mathematical::pi)
         )
@@ -103,6 +117,26 @@ defineDimensionedConstantWithDefault
 
     constantplasmakappaCoulomb,
     "kappaCoulomb"
+);
+
+defineDimensionedConstantWithDefault
+(
+    plasma::group,
+    plasma::kappaBoltzmann,
+
+    dimensionedScalar
+    (
+        "kappaBoltzmann",
+        dimensionedScalar
+        (
+            "kappaBoltzmann",
+            dimensionSet(1, 2, -2, -1, 0, 0, 0),
+            1.380649e-23
+        )
+    ),
+
+    constantplasmakappaBoltzmann,
+    "kappaBoltzmann"
 );
 
 } // End namespace constant

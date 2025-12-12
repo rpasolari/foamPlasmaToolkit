@@ -13,7 +13,7 @@ cd "${0%/*}" || exit 1
 echo ">>> Cleaning bcs in src/bcs"
 echo "----------------------------------------------"
 
-wclean coupledElectricPotential/
+wclean
 
 echo "----------------------------------------------"
 echo ">>> Done cleaning bcs."

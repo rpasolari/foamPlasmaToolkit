@@ -14,7 +14,7 @@
 
 PtrList<volScalarField> ePotentialDielectric(dielectricRegions.size());
 PtrList<IOdictionary> electricPropertiesDictDielectric(dielectricRegions.size());
-PtrList<surfaceScalarField> surfChargeDielectric(dielectricRegions.size());
+PtrList<volScalarField> surfChargeDielectric(dielectricRegions.size());
 PtrList<dimensionedScalar> epsilonDielectric(dielectricRegions.size());
 
 List<scalar> epsilonRDielectric(dielectricRegions.size());
@@ -47,39 +47,24 @@ forAll(dielectricRegions, i)
         )
     );
 
-    {
-        IOobject surfChargeHeader
+    Info << "   Adding to surfChargeDielectric\n" << endl;
+    surfChargeDielectric.set
+    (
+        i,
+        new volScalarField
         (
-            "surfCharge",
-            runTime.timeName(),
-            dielectricRegions[i],
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        );
-
-        if (surfChargeHeader.typeHeaderOk<surfaceScalarField>())
-        {
-            surfChargeDielectric.set
+            IOobject
             (
-                i,
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "surfCharge",
-                        runTime.timeName(),
-                        dielectricRegions[i],
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    dielectricRegions[i]
-                )
-            );
-
-            regIOobject::store(&surfChargeDielectric[i]);
-            Info << "   Adding to surfChargeDielectric\n" << endl;
-        }
-    }
+                "surfCharge",
+                runTime.timeName(),
+                dielectricRegions[i],
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            dielectricRegions[i],
+            dimensionedScalar("zero", dimensionSet(0, -2, 1, 0, 0, 1, 0), 0.0)
+        )
+    );
 
     electricPropertiesDictDielectric.set
     (

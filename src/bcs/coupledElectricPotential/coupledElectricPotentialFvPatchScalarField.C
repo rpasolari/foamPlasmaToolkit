@@ -13,13 +13,14 @@
       See: <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "coupledElectricPotentialFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "mappedPatchBase.H"
 #include "IOField.H"
 #include "mappedPatchFieldBase.H"
+
+#include "coupledElectricPotentialFvPatchScalarField.H"
 #include "foamPlasmaToolkitConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -389,13 +390,22 @@ void coupledElectricPotentialFvPatchScalarField::updateCoeffs()
     scalarField epsilonDeltaC(this->size(), GREAT);
 
     scalarField surfCharge(phiP.size(), Zero);
-	if (surfChargeName_ != "none")
-	{
-		surfCharge =
-			patch().lookupPatchField<surfaceScalarField>(
-				surfChargeName_
-			);
-	}
+    if (surfChargeName_ != "none")
+        {
+            if (db().foundObject<volScalarField>(surfChargeName_))
+            {
+                const volScalarField& sigma = 
+                    db().lookupObject<volScalarField>(surfChargeName_);
+                
+                surfCharge = sigma.boundaryField()[patch().index()];
+            }
+            else
+            {
+                WarningInFunction 
+                    << "Field '" << surfChargeName_<< "' not found in registry." 
+                    << endl;
+            }
+        }
 
     scalarField surfChargeNbr(phiP.size(), Zero);
     if (surfChargeNbrName_ != "none")
@@ -403,24 +413,17 @@ void coupledElectricPotentialFvPatchScalarField::updateCoeffs()
         if (mpp.sameWorld())
         {
             const polyMesh& nbrMesh = mpp.sampleMesh();
-            const label samplePatchi =
-                mpp.samplePolyPatch().index();
+            const label samplePatchi = mpp.samplePolyPatch().index();
 
-            const fvPatch& nbrPatch =
-                refCast<const fvMesh>(nbrMesh)
-                    .boundary()[samplePatchi];
-
-            surfChargeNbr =
-                nbrPatch.lookupPatchField<surfaceScalarField>
-                (surfChargeNbrName_);
+            if (nbrMesh.foundObject<volScalarField>(surfChargeNbrName_))
+            {
+                const volScalarField& sigmaNbr = 
+                    nbrMesh.lookupObject<volScalarField>
+                    (surfChargeNbrName_);
+                
+                surfChargeNbr = sigmaNbr.boundaryField()[samplePatchi];
+            }
         }
-        else
-        {
-            surfChargeNbr =
-                patch().lookupPatchField<surfaceScalarField>
-                (surfChargeNbrName_);
-        }
-
         distribute(surfChargeNbrName_, surfChargeNbr);
     }
 

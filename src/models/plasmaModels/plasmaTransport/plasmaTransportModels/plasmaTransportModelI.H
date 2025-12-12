@@ -23,6 +23,11 @@ Foam::plasmaTransportModel::modelName() const
     return modelName_;
 }
 
+inline const Foam::word& 
+Foam::plasmaTransportModel::fluxScheme() const
+{
+    return fluxScheme_;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

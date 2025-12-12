@@ -53,7 +53,6 @@ SourceFiles
 #include "fvMesh.H"
 #include "PtrList.H"
 
-
 #include "plasmaSpecies.H"
 #include "plasmaTransportModel.H"
 
@@ -67,6 +66,8 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class plasmaTransport
+:
+    public regIOobject
 {
 private:
 
@@ -79,11 +80,11 @@ private:
     //- Reference to the electric field
     const volVectorField& E_;
 
-    //- Flux fields Gamma for each species
-    PtrList<volVectorField> flux_;
+    //- Surface Particle Flux [1/s]
+    PtrList<surfaceScalarField> particleFlux_;
 
-    //- Surface advection flux for each species
-    PtrList<surfaceScalarField> surfaceFlux_;
+    //- Volumetric Particle Flux Vector [1/m^2/s]
+    PtrList<volVectorField> Gamma_;
 
     //- Per-species transport models
     PtrList<plasmaTransportModel> transportModels_;
@@ -118,8 +119,13 @@ public:
         //- Correct all models
         void correct();
 
-        tmp<volScalarField> elecConductionCoeff() const;
-        tmp<volScalarField> elecDiffusionCharge() const;
+        //- Return total electrical conductivity [S/m]
+        tmp<volScalarField> electricalConductivity() const;
+
+        //- Return total diffusive charge source [C/m^3/s]
+        tmp<volScalarField> diffusiveChargeSource() const;
+
+        virtual bool writeData(Ostream& os) const;
 
     // Access
 
@@ -132,16 +138,16 @@ public:
         inline const plasmaTransportModel& model(const label i) const;
 
         //- Flux access
-        inline const volVectorField& flux(label i) const;
-        inline volVectorField& flux(label i);
-        inline const PtrList<volVectorField>& flux() const;
-        inline PtrList<volVectorField>& flux();
+        inline const surfaceScalarField& particleFlux(label i) const;
+        inline surfaceScalarField& particleFlux(label i);
+        inline const PtrList<surfaceScalarField>& particleFlux() const;
+        inline PtrList<surfaceScalarField>& particleFlux();
 
         //- Surface Flux access
-        inline const surfaceScalarField& surfaceFlux(label i) const;
-        inline surfaceScalarField& surfaceFlux(label i);
-        inline const PtrList<surfaceScalarField>& surfaceFlux() const;
-        inline PtrList<surfaceScalarField>& surfaceFlux();
+        inline const volVectorField& Gamma(label i) const;
+        inline volVectorField& Gamma(label i);
+        inline const PtrList<volVectorField>& Gamma() const;
+        inline PtrList<volVectorField>& Gamma();
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -59,6 +59,18 @@ Foam::plasmaSpecies::speciesCharge(Foam::label i) const
     return speciesCharge_[i];
 }
 
+inline const Foam::PtrList<Foam::dimensionedScalar>&
+Foam::plasmaSpecies::speciesMass() const
+{
+    return speciesMass_;
+}
+
+inline const Foam::dimensionedScalar&
+Foam::plasmaSpecies::speciesMass(Foam::label i) const
+{
+    return speciesMass_[i];
+}
+
 inline Foam::label
 Foam::plasmaSpecies::speciesID(const Foam::word& name) const
 {

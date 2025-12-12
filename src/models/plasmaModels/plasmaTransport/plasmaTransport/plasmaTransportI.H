@@ -44,53 +44,53 @@ Foam::plasmaTransport::model(const label i) const
 }
 
 //- Flux access
-inline const Foam::volVectorField&
-Foam::plasmaTransport::flux(Foam::label i) const
-{
-    return flux_[i];
-}
-
-inline Foam::volVectorField&
-Foam::plasmaTransport::flux(Foam::label i)
-{
-    return flux_[i];
-}
-
-inline const Foam::PtrList<Foam::volVectorField>&
-Foam::plasmaTransport::flux() const
-{
-    return flux_;
-}
-
-inline Foam::PtrList<Foam::volVectorField>&
-Foam::plasmaTransport::flux()
-{
-    return flux_;
-}
-
-//- Surface Flux access
 inline const Foam::surfaceScalarField&
-Foam::plasmaTransport::surfaceFlux(Foam::label i) const
+Foam::plasmaTransport::particleFlux(Foam::label i) const
 {
-    return surfaceFlux_[i];
+    return particleFlux_[i];
 }
 
 inline Foam::surfaceScalarField&
-Foam::plasmaTransport::surfaceFlux(Foam::label i)
+Foam::plasmaTransport::particleFlux(Foam::label i)
 {
-    return surfaceFlux_[i];
+    return particleFlux_[i];
 }
 
 inline const Foam::PtrList<Foam::surfaceScalarField>&
-Foam::plasmaTransport::surfaceFlux() const
+Foam::plasmaTransport::particleFlux() const
 {
-    return surfaceFlux_;
+    return particleFlux_;
 }
 
 inline Foam::PtrList<Foam::surfaceScalarField>&
-Foam::plasmaTransport::surfaceFlux()
+Foam::plasmaTransport::particleFlux()
 {
-    return surfaceFlux_;
+    return particleFlux_;
+}
+
+//- Surface Flux access
+inline const Foam::volVectorField&
+Foam::plasmaTransport::Gamma(Foam::label i) const
+{
+    return Gamma_[i];
+}
+
+inline Foam::volVectorField&
+Foam::plasmaTransport::Gamma(Foam::label i)
+{
+    return Gamma_[i];
+}
+
+inline const Foam::PtrList<Foam::volVectorField>&
+Foam::plasmaTransport::Gamma() const
+{
+    return Gamma_;
+}
+
+inline Foam::PtrList<Foam::volVectorField>&
+Foam::plasmaTransport::Gamma()
+{
+    return Gamma_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

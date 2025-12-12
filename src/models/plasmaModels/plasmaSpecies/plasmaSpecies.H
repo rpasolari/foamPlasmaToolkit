@@ -102,6 +102,9 @@ protected:
         //- Charge per species
         PtrList<dimensionedScalar> speciesCharge_;
 
+        //- Mass per species
+        PtrList<dimensionedScalar> speciesMass_;
+
         //- Number density fiels n_i [1/m3] for each species
         PtrList<volScalarField> numberDensity_;
 
@@ -129,7 +132,6 @@ public:
 
     // Access
 
-        
         inline const fvMesh& mesh() const;
         inline const wordList& speciesNames() const;
         inline label nSpecies() const;
@@ -137,6 +139,9 @@ public:
         inline scalar speciesChargeNumber(label i) const;
         inline const PtrList<dimensionedScalar>& speciesCharge() const;
         inline const dimensionedScalar& speciesCharge(label i) const;
+        inline const PtrList<dimensionedScalar>& speciesMass() const;
+        inline const dimensionedScalar& speciesMass(label i) const;
+
         //- Get species index from name
         inline label speciesID(const word& name) const;
 

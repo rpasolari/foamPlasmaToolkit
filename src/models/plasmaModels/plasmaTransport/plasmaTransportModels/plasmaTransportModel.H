@@ -53,6 +53,7 @@ SourceFiles
 #define Foam_plasmaTransportModel_H
 
 #include "fvMesh.H"
+#include "fvMatrix.H"
 #include "autoPtr.H"
 #include "dictionary.H"
 #include "runTimeSelectionTables.H"
@@ -90,6 +91,9 @@ protected:
 
     //- Index of the species this model applies to
     const label specieIndex_;
+
+    //- Flux scheme (e.g. standard, ScharfetterGummel)
+    word fluxScheme_;
 
 public:
 
@@ -145,6 +149,12 @@ public:
         //- Correct model / Update drift velocity (and diffusivity if present)
         virtual void correct() = 0;
 
+        //- Return the transport equation (Matrix)
+        virtual tmp<fvScalarMatrix> nEqn() const = 0;
+
+        //- Return the particle flux (1/s)
+        virtual tmp<surfaceScalarField> particleFlux() const = 0;
+
         //- Getter for drift velocity
         virtual const volVectorField& driftVelocity() const = 0;
 
@@ -152,15 +162,17 @@ public:
         virtual const volScalarField* diffusivity() const { return nullptr; }
 
         //- Getter for electric conduction coefficient
-        virtual tmp<volScalarField> elecConductionCoeff() const = 0;
+        virtual tmp<volScalarField> electricalConductivity() const = 0;
 
         //- Getter for electric diffusion charge
-        virtual tmp<volScalarField> elecDiffusionCharge() const = 0;
-
+        virtual tmp<volScalarField> diffusiveChargeSource() const = 0;
 
     // Access
 
         inline const word& modelName() const;
+
+        //- Flux scheme
+        inline const word& fluxScheme() const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

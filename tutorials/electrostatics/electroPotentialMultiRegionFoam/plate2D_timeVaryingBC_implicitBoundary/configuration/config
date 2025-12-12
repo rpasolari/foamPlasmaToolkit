@@ -7,7 +7,7 @@ dirichletValueLeft		1.0;
 dirichletValueRight		0.0;
 surfChargeDict          surfCharge;
 useImplicit             true;
-surfCharge				0;
+surfCharge				0.0;
 
 endTime 				10;
 

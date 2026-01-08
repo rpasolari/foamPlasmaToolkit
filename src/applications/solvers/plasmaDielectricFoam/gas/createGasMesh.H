@@ -24,24 +24,33 @@ if (gasNames.size() > 1)
 
 const word gasRegionName = gasNames[0];
 
-autoPtr<fvMesh> gasMesh;
+autoPtr<dynamicFvMesh> gasMesh;
 
+Info
+    << "Create gas mesh for region " << gasRegionName
+    << " for time = " << runTime.timeName() << nl << endl;
+
+gasMesh.reset
+(
+    dynamicFvMesh::New
+    (
+        IOobject
+        (
+            gasRegionName,
+            runTime.timeName(),
+            runTime,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ).ptr()
+);
+
+// Handle Dry-Run flags separately
 if (args.dryRun() || args.found("dry-run-write"))
 {
-    Info
-        << "Operating in 'dry-run' mode: "
-        << "case will run for 1 time step. "
-        << "All checks assumed OK on a clean exit" << endl;
-
+    Info<< "Operating in 'dry-run' mode" << endl;
     FieldBase::allowConstructFromLargerSize = true;
 
-    // Create simplified 1D mesh
-    gasMesh.reset
-    (
-        new simplifiedMeshes::columnFvMesh(runTime, gasRegionName)
-    );
-
-    // Stop after 1 iteration
     if (args.found("dry-run-write"))
     {
         runTime.stopAt(Time::saWriteNow);
@@ -53,24 +62,4 @@ if (args.dryRun() || args.found("dry-run-write"))
     }
 
     functionObject::outputPrefix = "postProcessing-dry-run";
-}
-else
-{
-    Info
-        << "Create gas mesh for region " << gasRegionName
-        << " for time = " << runTime.timeName() << nl << endl;
-
-    gasMesh.reset
-    (
-        new fvMesh
-        (
-            IOobject
-            (
-                gasRegionName,
-                runTime.timeName(),
-                runTime,
-                IOobject::MUST_READ
-            )
-        )
-    );
 }

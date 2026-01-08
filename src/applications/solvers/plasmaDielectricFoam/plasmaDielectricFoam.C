@@ -39,6 +39,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "dynamicFvMesh.H"
 #include "regionProperties.H"
 #include "fvOptions.H"
 #include "coordinateSystem.H"
@@ -89,6 +90,8 @@ int main(int argc, char *argv[])
 
         Info << "Time = " << runTime.timeName() << nl << endl;
 
+        gasMesh().update();
+
         timeControl.adjustDeltaT(transport);
 
         // Solve the Poisson/Laplace Equation (electric potential)
@@ -105,7 +108,7 @@ int main(int argc, char *argv[])
         #include "calculateElectricField.H"
 
         transport.correct();
-
+        // Info << "ELAFKI3" << endl;
         #include "updateChargeDensity.H"
         #include "updateSurfCharge.H"
 

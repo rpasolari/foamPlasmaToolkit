@@ -15,6 +15,14 @@ echo "----------------------------------------------"
 ./petsc4Foam/Allwclean 
 
 echo ""
+
+echo ">>> Cleaning blastAMR"
+echo "----------------------------------------------"
+
+./blastAMR/Allwclean 
+
+echo ""
+
 echo ">>> Cleaning NEXT THIRD PARTY"
 echo "----------------------------------------------"
 

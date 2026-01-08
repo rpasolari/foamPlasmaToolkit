@@ -109,15 +109,15 @@ namespace fvm
         auto Bern = [](scalar x) -> scalar
         {
             // Limit 1: Singularity at x = 0
-            if (mag(x) < 1e-4) 
+            if (mag(x) < 1e-2) 
             {
                 return 1.0 - x/2.0 + sqr(x)/12.0 - pow4(x)/720.0;
             }
-            // Limit 2: B(200) = 0 effectively
-            if (x > 200)    return 0.0;
+            // Limit 2: B(80) = 0 effectively
+            if (x > 80)    return 0.0;
 
             // Limit 3: At x -> -inf, B(x) = -x
-            if (x < -200)   return -x;
+            if (x < -80)   return -x;
 
             // Standard calculation
             return x / (exp(x) - 1.0); 

@@ -70,6 +70,8 @@ public:
         //- Using OpenFOAM norm for convergence testing
         bool useFoamTest;
 
+        mutable label nrows;
+
         Mat Amat;
         KSP ksp;
 
@@ -99,6 +101,7 @@ public:
             init_(false),
             init_aux_vectors_(false),
             useFoamTest(false),
+            nrows(0),
             Amat(nullptr),
             ksp(nullptr),
             sol(nullptr),

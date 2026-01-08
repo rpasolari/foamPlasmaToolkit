@@ -95,6 +95,9 @@ protected:
     //- Flux scheme (e.g. standard, ScharfetterGummel)
     word fluxScheme_;
 
+    //- Global shared zero vector field for stationary species
+    static autoPtr<volVectorField> zeroVectorFieldPtr_;
+
 public:
 
     //- Runtime type information

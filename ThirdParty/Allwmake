@@ -27,6 +27,19 @@ else
 fi
 
 echo ""
+
+echo ">>> Building blastAMR"
+echo "----------------------------------------------"
+
+if ./blastAMR/Allwmake; then
+    echo -e "${GREEN}>>> blastAMR built successfully${NC}"
+else
+    echo -e "${RED}>>> blastAMR build FAILED (ignored)${NC}"
+    FAILED+=("blastAMR")
+fi
+
+echo ""
+
 echo ">>> Building NEXT THIRD PARTY"
 echo "----------------------------------------------"
 

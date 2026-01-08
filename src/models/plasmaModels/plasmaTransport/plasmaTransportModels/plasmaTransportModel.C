@@ -23,6 +23,8 @@ namespace Foam
 defineTypeNameAndDebug(plasmaTransportModel, 0);
 defineRunTimeSelectionTable(plasmaTransportModel, dictionary);
 
+autoPtr<volVectorField> plasmaTransportModel::zeroVectorFieldPtr_(nullptr);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 plasmaTransportModel::plasmaTransportModel
@@ -56,6 +58,31 @@ autoPtr<plasmaTransportModel> plasmaTransportModel::New
     const volVectorField& E
 )
 {
+    if (!zeroVectorFieldPtr_.valid())
+    {
+        zeroVectorFieldPtr_.reset
+        (
+            new volVectorField
+            (
+                IOobject
+                (
+                    "zeroDriftVelocity",
+                    mesh.time().constant(), 
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh,
+                dimensionedVector
+                (
+                    "zero", 
+                    dimensionSet(0, 1, -1, 0, 0, 0, 0),
+                    vector::zero
+                )
+            )
+        );
+    }
+
     // Lookup constructor using function-call operator
     auto* ctorPtr = dictionaryConstructorTable(modelName);
 

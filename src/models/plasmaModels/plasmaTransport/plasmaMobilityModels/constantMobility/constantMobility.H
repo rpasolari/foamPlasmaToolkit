@@ -30,10 +30,13 @@ Description
     This model returns a uniform mobility value μ throughout the domain,
     specified in the mobilityCoeffs sub-dictionary:
 
+    Required dictionary entries:
+    \verbatim
         mobilityCoeffs
         {
-            mu   0.1;
+            mu   <scalar>;
         }
+    \verbatim
 
     It is selected at runtime via:
 

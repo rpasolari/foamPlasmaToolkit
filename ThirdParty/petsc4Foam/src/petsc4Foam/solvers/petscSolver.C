@@ -152,11 +152,24 @@ Foam::solverPerformance Foam::petscSolver::scalarSolve
     );
 
     const fvMesh& fvm = dynamicCast<const fvMesh>(matrix_.mesh().thisDb());
+    const label nrows_ = matrix_.mesh().lduAddr().size();
 
     const petscLinearSolverContexts& contexts =
         petscLinearSolverContexts::New(fvm);
 
     petscLinearSolverContext& ctx = contexts.getContext(eqName_);
+
+    if (ctx.initialized() && ctx.nrows != nrows_)
+    {
+        DebugInfo << "AMR Change: Recreating PETSc solver for " << eqName_ << nl;
+        if (ctx.Amat) MatDestroy(&ctx.Amat);
+        if (ctx.ksp)  KSPDestroy(&ctx.ksp);
+        if (ctx.sol)  VecDestroy(&ctx.sol);
+        if (ctx.rhs)  VecDestroy(&ctx.rhs);
+        ctx.initialized(false);
+    }
+    ctx.nrows = nrows_;
+
     const bool firsttimein = !ctx.initialized();
 
     if (firsttimein)
@@ -180,21 +193,36 @@ Foam::solverPerformance Foam::petscSolver::scalarSolve
 
         ctx.initialized(true);
 
-        AssertPETSc(PetscLogStageRegister
-        (
-            ("foam_" + eqName_ + "_mat").c_str(),
-            &ctx.matstage
-        ));
-        AssertPETSc(PetscLogStageRegister
-        (
-            ("foam_" + eqName_ + "_pc").c_str(),
-            &ctx.pcstage
-        ));
-        AssertPETSc(PetscLogStageRegister
-        (
-            ("foam_" + eqName_ + "_ksp").c_str(),
-            &ctx.kspstage
-        ));
+        string stagePrefix = "foam_" + fvm.name() + "_" + eqName_;
+
+        // Check if the stage already exists to prevent "already registered" error
+        PetscLogStage stageId = -1;
+        
+        // --- Matrix Stage ---
+        PetscLogStageGetId((stagePrefix + "_mat").c_str(), &stageId);
+        if (stageId == -1) // Not registered yet
+        {
+            AssertPETSc(PetscLogStageRegister((stagePrefix + "_mat").c_str(), &ctx.matstage));
+        }
+        else { ctx.matstage = stageId; }
+
+        // --- PC Stage ---
+        stageId = -1;
+        PetscLogStageGetId((stagePrefix + "_pc").c_str(), &stageId);
+        if (stageId == -1)
+        {
+            AssertPETSc(PetscLogStageRegister((stagePrefix + "_pc").c_str(), &ctx.pcstage));
+        }
+        else { ctx.pcstage = stageId; }
+
+        // --- KSP Stage ---
+        stageId = -1;
+        PetscLogStageGetId((stagePrefix + "_ksp").c_str(), &stageId);
+        if (stageId == -1)
+        {
+            AssertPETSc(PetscLogStageRegister((stagePrefix + "_ksp").c_str(), &ctx.kspstage));
+        }
+        else { ctx.kspstage = stageId; }
         AssertPETSc(PetscLogStagePush(ctx.matstage));
         buildMat(Amat, lowNonZero, maxLowNonZeroPerRow);;
         buildKsp(Amat, ksp);

@@ -30,10 +30,13 @@ Description
     This model returns a uniform diffusivity value D throughout the domain,
     specified in the diffusivityCoeffs sub-dictionary:
 
+    Required dictionary entries:
+    \verbatim
         diffusivityCoeffs
         {
-            D   0.1;
+            D   <scalar>;
         }
+    \verbatim
 
     It is selected at runtime via:
 

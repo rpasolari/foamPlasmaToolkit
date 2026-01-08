@@ -140,25 +140,113 @@ plasmaTransport::plasmaTransport
 
 // * * * * * * * * * * * * * * Public Member Functions * * * * * * * * * * * //
 
+// void plasmaTransport::correct()
+// {
+//     const label nSpecies = species_.nSpecies();
+
+//     for (label i = 0; i < nSpecies; ++i)
+//     {
+//         // Update coefficients (mobility, diffusivity, driftVelocity etc.)
+//         transportModels_[i].correct();
+
+//         // Build the matrix
+//         tmp<fvScalarMatrix> tEqn = transportModels_[i].nEqn();
+//         fvScalarMatrix& nEqn = tEqn.ref();
+
+//         // Solve the transport equation
+//         nEqn.solve();
+
+//         // Update fluxes
+//         particleFlux_[i] = transportModels_[i].particleFlux();
+//         Gamma_[i] = fvc::reconstruct(particleFlux_[i]);
+//     }
+// }
+
 void plasmaTransport::correct()
 {
     const label nSpecies = species_.nSpecies();
+    label eIdx = species_.speciesID("e");
+    label iIdx = species_.speciesID("pIon");
 
+    // 1. Update transport properties (mobility, diffusion) based on current E
     for (label i = 0; i < nSpecies; ++i)
     {
-        // Update coefficients (mobility, diffusivity, driftVelocity etc.)
         transportModels_[i].correct();
+    }
 
-        // Build the matrix
-        tmp<fvScalarMatrix> tEqn = transportModels_[i].nEqn();
-        fvScalarMatrix& nEqn = tEqn.ref();
+    // 2. Extract Electric Field magnitude and normalize for empirical fits
+    const volScalarField& ne = species_.numberDensity(eIdx);
+    volScalarField Emag(mag(E_));
+    
+    dimensionedScalar E_floor("E_floor", Emag.dimensions(), 1.0);
+    dimensionedScalar E_unit("E_unit", Emag.dimensions(), 1.0);
+    volScalarField E_num = max(Emag, E_floor) / E_unit;
 
-        // Solve the transport equation
-        nEqn.solve();
+    // 3. Calculate Ionization (alpha) and Attachment (eta) coefficients
+    volScalarField alpha = (1.1944e6 + 4.3666e26/pow(E_num, 3)) * exp(-2.73e7/E_num) 
+                         * dimensionedScalar("invM", dimensionSet(0,-1,0,0,0,0,0), 1.0);
+    
+    dimensionedScalar eta("eta", dimensionSet(0,-1,0,0,0,0,0), 340.75);
 
-        // Update fluxes
-        particleFlux_[i] = transportModels_[i].particleFlux();
-        Gamma_[i] = fvc::reconstruct(particleFlux_[i]);
+    // 4. Calculate Drift Velocity magnitude and effective rate
+    volScalarField veMag = mag(transportModels_[eIdx].driftVelocity());
+    volScalarField k_eff = (alpha - eta) * veMag;
+
+    // --- DIAGNOSTIC PRINTING START ---
+    {
+        // Total particles created/lost per second
+        dimensionedScalar totalNetSource = fvc::domainIntegrate(k_eff * ne);
+        // Total population in the domain
+        dimensionedScalar totalElectrons = fvc::domainIntegrate(ne);
+        // Peak values for coefficients
+        scalar maxAlpha = gMax(alpha.primitiveField());
+        scalar maxK = gMax(mag(k_eff.primitiveField()));
+        
+        // Manual calculation of convection magnitude: div(velocity * density)
+        // We use the drift velocity from the electron transport model
+        volVectorField Ue = transportModels_[eIdx].driftVelocity();
+        dimensionedScalar totalConv = fvc::domainIntegrate(mag(fvc::div(fvc::flux(Ue), ne)));
+
+        Info<< "\n--- Plasma Diagnostics [Time: " << mesh_.time().timeName() << "] ---" << endl;
+        Info<< "  Total Electrons:    " << totalElectrons.value() << endl;
+        Info<< "  Max Alpha:          " << maxAlpha << " [m^-1]" << endl;
+        Info<< "  Net Source Rate:    " << totalNetSource.value() << " [s^-1]" << endl;
+        
+        if (maxK > 0)
+        {
+            Info<< "  Chem. Timescale:    " << 1.0/maxK << " [s] (dt: " << mesh_.time().deltaTValue() << ")" << endl;
+        }
+
+        if (totalConv.value() > 1e-20)
+        {
+            Info<< "  Source/Conv Ratio:  " << (mag(totalNetSource).value() / totalConv.value()) << endl;
+        }
+        Info<< "------------------------------------------------------\n" << endl;
+    }
+    // --- DIAGNOSTIC PRINTING END ---
+
+    // 5. Solve Electron Continuity Equation
+    {
+        tmp<fvScalarMatrix> tEqne = transportModels_[eIdx].nEqn();
+        fvScalarMatrix& nEqne = tEqne.ref();
+
+        // Use SuSp for the source term S = k_eff * ne
+        nEqne -= fvm::SuSp(k_eff, ne); 
+
+        nEqne.solve();
+    }
+
+    // 6. Solve Positive Ion Equation (Immobile ions)
+    {
+        const volScalarField& neNew = species_.numberDensity(eIdx);
+        
+        tmp<fvScalarMatrix> tEqni = transportModels_[iIdx].nEqn();
+        fvScalarMatrix& nEqni = tEqni.ref();
+
+        // Ion production rate 
+        nEqni -= k_eff * neNew;
+
+        nEqni.solve();
     }
 }
 

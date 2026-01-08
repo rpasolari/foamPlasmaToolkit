@@ -54,7 +54,7 @@ if (!coupled)
             (
                 "dt",
                 dimensionSet(0,0,1,0,0,0,0),
-                mesh.time().deltaTValue()
+                gasMesh().time().deltaTValue()
             );
 
             fvScalarMatrix PoissonEquation(

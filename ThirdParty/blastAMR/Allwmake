@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+cd "${0%/*}" || exit                                # Run from this directory
+. "${WM_PROJECT_DIR:?}"/wmake/scripts/AllwmakeParseArguments
+
+wmake src/lagrangian
+wmake src/loadPolicies
+wmake src/cpuLoad
+wmake src/errorEstimators
+wmake src/dynamicMesh
+wmake src/dynamicFvMesh
+wmake src/functionObjects
+
+wmake applications/utilities/updateMesh
+# -----------------------------------------------------------------------------

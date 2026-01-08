@@ -260,7 +260,7 @@ tmp<surfaceScalarField> driftDiffusion::particleFlux() const
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedScalar("zero", dimensionSet(0, 0, -1, 0, 0, 0, 0),0.0)
+            dimensionedScalar("zero", dimensionSet(0, 0, -1, 0, 0, 0, 0), 0.0)
         )
     );
 

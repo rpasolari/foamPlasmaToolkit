@@ -1,34 +1,20 @@
-/*---------------------------------------------------------------------------*\
-  File: createDielectricMeshes.H
-  Part of: foamPlasmaToolkit
-  Developed using the OpenFOAM framework and linked against OpenFOAM libraries.
+const wordList fluidNames(rp["fluid"]);
 
-  Description:
-      Derived from createSolidMeshes.H in OpenFOAM v2412.
-      Creates and initializes the dielectric-region meshes.
+PtrList<dynamicFvMesh> fluidRegions(fluidNames.size());
 
-  Copyright (C) 2025 Rention Pasolari
-  License: GNU General Public License v3 or later
-      See: <http://www.gnu.org/licenses/>.
-\*---------------------------------------------------------------------------*/
-
-const wordList dielectricNames(rp["dielectric"]);
-
-PtrList<dynamicFvMesh> dielectricRegions(dielectricNames.size());
-
-forAll(dielectricNames, i)
+forAll(fluidNames, i)
 {
-    Info << "Create dielectric mesh for region " << dielectricNames[i]
+    Info << "Create fluid mesh for region " << fluidNames[i]
             << " for time = " << runTime.timeName() << nl << endl;
 
-    dielectricRegions.set
+    fluidRegions.set
     (
         i,
         dynamicFvMesh::New
         (
             IOobject
             (
-                dielectricNames[i],
+                fluidNames[i],
                 runTime.timeName(),
                 runTime,
                 IOobject::MUST_READ,
@@ -41,7 +27,7 @@ forAll(dielectricNames, i)
     if (args.dryRun() || args.found("dry-run-write"))
     {
         Info<< "Operating in 'dry-run' mode for region " 
-            << dielectricNames[i] << endl;
+            << fluidNames[i] << endl;
         
         FieldBase::allowConstructFromLargerSize = true;
 
@@ -51,7 +37,7 @@ forAll(dielectricNames, i)
             runTime.stopAt(Time::saWriteNow);
 
             // Ensure mesh gets output to the current time step
-            dielectricRegions[i].setInstance(runTime.timeName());
+            fluidRegions[i].setInstance(runTime.timeName());
         }
         else
         {

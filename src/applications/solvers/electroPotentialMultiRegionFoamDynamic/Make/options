@@ -1,22 +1,19 @@
 EXE_INC = \
-    -I./gas \
+    -I./fluid \
     -I./dielectric \
     -I./include \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
-    -I$(LIB_SRC)/OpenFOAM/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/constants/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/models/plasmaModels/plasmaSpecies/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/models/plasmaModels/plasmaTransport/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/numerics/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/bcs/lnInclude \
-    -I$(FOAM_PLASMA_SRC)/tools/decompositionMethods/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/dynamicFvMesh/lnInclude \
     -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/dynamicMesh/lnInclude \
+    -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/errorEstimators/lnInclude \
+    -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/lagrangian/lnInclude \
     -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/loadPolicies/lnInclude \
-    -I$(FOAM_PLASMA_THIRD_PARTY)/blastAMR/src/errorEstimators/lnInclude
+    -I$(LIB_SRC)/OpenFOAM/lnInclude \
+    -I$(FOAM_PLASMA_SRC)/constants/lnInclude \
+    -I$(FOAM_PLASMA_SRC)/bcs/lnInclude
 
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
@@ -28,12 +25,10 @@ EXE_LIBS = \
     -lOpenFOAM \
     -lregionModels \
     -lfoamPlasmaToolkitConstants \
-    -lplasmaSpecies \
-    -lplasmaTransport \
-    -lplasmaNumerics \
     -lplasmaBCs \
-    -lplasmaDecompositionMethods \
     -lamrDynamicFvMesh \
     -lamrDynamicMesh \
+    -lamrIndicators \
+    -lamrLagrangian \
     -lamrLoadPolicies \
-    -lamrIndicators
+    -lamrCPULoad

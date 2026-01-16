@@ -48,6 +48,48 @@ Info<<
     Info<< endl;
 }
 
+// Adaptive Mesh Refinement (AMR) Configuration
+{
+    Info<< "Adaptive Mesh Refinement (AMR):" << nl;
+
+    if (enableAMR)
+    {
+        Info<< "    Status:         ENABLED" << nl;
+        Info<< "    Refine Interval: " << AMRInterval << " steps" << nl;
+
+        if (restrictAMRToPlasma)
+        {
+            Info<< "    Mode:           RESTRICTED (Plasma region only)" << nl;
+        }
+        else
+        {
+            Info<< "    Mode:           MULTI-REGION" << nl;
+            
+            word syncStr = conformalAMRSync ? "ENABLED (Conformal)" : "DISABLED";
+            Info<< "    Sync Strategy:  " << syncStr << nl;
+
+            // Report which regions are participating in the sync
+            if (conformalAMRSync)
+            {
+                string syncRegions = gasMesh().name();
+                forAll(dielectricRegions, i)
+                {
+                    if (touchesGas[i])
+                    {
+                        syncRegions += ", " + dielectricRegions[i].name();
+                    }
+                }
+                Info<< "    Sync Regions:   [" << syncRegions << "]" << nl;
+            }
+        }
+    }
+    else
+    {
+        Info<< "    Status:         DISABLED" << nl;
+    }
+    Info<< endl;
+}
+
 // Electrostatics (Poisson & Region Coupling)
 {
     Info<< "Electrostatics (Poisson & Region Coupling):" << nl;

@@ -47,12 +47,13 @@ Author
 #include "fvSolution.H"
 #include "solutionControl.H"
 #include "mappedPatchBase.H"
-#include "solidSurfaceFluxFvPatchScalarField.H"
 
+#include "solidSurfaceFluxFvPatchScalarField.H"
 #include "foamPlasmaToolkitConstants.H"
 #include "plasmaSpecies.H"
 #include "plasmaTransport.H"
 #include "plasmaTimeControl.H"
+#include "adaptiveFvMesh.H"
 
 int main(int argc, char *argv[])
 {
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
     timeControl.setInitialDeltaT(transport);
 
     #include "createCoupledRegions.H"
+    #include "readAMRConfiguration.H"
 
     #include "readElectricPotentialControls.H"
 
@@ -90,7 +92,9 @@ int main(int argc, char *argv[])
 
         Info << "Time = " << runTime.timeName() << nl << endl;
 
-        gasMesh().update();
+        #include "syncMultiRegionAMR.H"
+
+        // gasMesh().update();
 
         timeControl.adjustDeltaT(transport);
 
